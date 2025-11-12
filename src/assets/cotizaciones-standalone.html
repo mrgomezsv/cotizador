@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Cotizaciones - MR</title>
+    <style>
+        /* Importar la paleta de colores del global.scss */
+        :root {
+            --primary-color: #0C3C4C;
+            --secondary: #D4A15A;
+            --background-main: #F8F9FA;
+            --background-card: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #495057;
+            --text-muted: #6C757D;
+            --white: #FFFFFF;
+            --button-primary: #D4A15A;
+            --button-primary-hover: #E6B366;
+            --button-secondary: #0C3C4C;
+            --button-secondary-hover: #1A5A6B;
+            --input-background: #FFFFFF;
+            --input-border: #CED4DA;
+            --input-focus: #D4A15A;
+            --border-color: #DEE2E6;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+            --shadow-medium: rgba(0, 0, 0, 0.15);
+            --success-color: #28A745;
+            --error-color: #DC3545;
+            
+            /* Colores del sidebar para dar personalidad */
+            --sidebar-background: #2C3E50;
+            --sidebar-hover: #34495E;
+            --sidebar-active: #D4A15A;
+            --sidebar-text: #ECF0F1;
+            --sidebar-border: #34495E;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Work Sans', Arial, sans-serif;
+            background: var(--background-main);
+            padding: 20px;
+            color: var(--text-primary);
+        }
+
+        .cotizaciones-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            background: var(--background-card);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .cotizacion-form fieldset {
+            border: 2px solid var(--border-color);
+            margin-bottom: 20px;
+            padding: 20px;
+            border-radius: 12px;
+            background: var(--background-card);
+        }
+
+        .cotizacion-form legend {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            padding: 0 10px;
+        }
+
+        .cotizacion-form label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .cotizacion-form input[type="text"], 
+        .cotizacion-form input[type="date"],
+        .cotizacion-form input[type="number"] {
+            width: 60%;
+            padding: 12px 16px;
+            margin-left: 8px;
+            border-radius: 8px;
+            border: 2px solid var(--input-border);
+            background: var(--input-background);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+
+        .cotizacion-form input[type="text"]:focus, 
+        .cotizacion-form input[type="date"]:focus,
+        .cotizacion-form input[type="number"]:focus {
+            outline: none;
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(212, 161, 90, 0.1);
+        }
+
+        .cotizacion-form textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--input-border);
+            background: var(--input-background);
+            color: var(--text-primary);
+            resize: vertical;
+            transition: all 0.3s ease;
+        }
+
+        .cotizacion-form textarea:focus {
+            outline: none;
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 3px rgba(212, 161, 90, 0.1);
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+
+        .items-table th, .items-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            text-align: left;
+        }
+
+        .items-table th {
+            background: var(--primary-color);
+            color: var(--white);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .items-table tr:nth-child(even) {
+            background: var(--background-main);
+        }
+
+        .items-table tr:hover {
+            background: rgba(212, 161, 90, 0.05);
+        }
+
+        .total {
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .remove-item {
+            background: var(--error-color);
+            color: var(--white);
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .remove-item:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        /* Estilos mejorados para el toggle de IVA */
+        .toggle-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .toggle-label span {
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin-left: 15px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--button-primary);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .toggle-slider:hover {
+            background-color: #b3b3b3;
+        }
+
+        input:checked + .toggle-slider:hover {
+            background-color: var(--button-primary-hover);
+        }
+
+        .add-item {
+            margin-top: 12px;
+            background: var(--button-primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .add-item:hover {
+            background: var(--button-primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-medium);
+        }
+
+        .actions {
+            display: flex;
+            gap: 16px;
+            margin: 24px 0;
+            justify-content: center;
+        }
+
+        .clear-form {
+            background: var(--button-secondary);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .clear-form:hover {
+            background: var(--button-secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-medium);
+        }
+
+        .download-cotizacion {
+            background: var(--success-color);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px var(--shadow-color);
+        }
+
+        .download-cotizacion:hover {
+            background: #218838;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--shadow-medium);
+        }
+
+        .download-cotizacion:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .download-pdf {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin: 30px 0 20px 0;
+        }
+
+        .preview-container {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .pdf-container {
+            width: 794px;
+            height: 1123px;
+            background: white;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            padding: 32px 40px;
+            position: relative;
+            overflow: hidden;
+            margin: 0 auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            height: 400px;
+            opacity: 0.05; /* Más transparente para mejor legibilidad */
+            z-index: 0;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .pdf-content, .pdf-footer {
+            position: relative;
+            z-index: 1;
+        }
+
+        .pdf-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cotizacion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+        }
+
+        .titulo {
+            text-align: center;
+            color: var(--sidebar-active);
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            width: 100%;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        .cotizacion-comentarios {
+            border: 0.5px solid var(--sidebar-background);
+            background: var(--background-main);
+            padding: 12px;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .cotizacion-comentarios strong {
+            color: var(--primary-color);
+        }
+
+        /* Ocultar el campo Nombre Empresa */
+        #empresa, label[for="empresa"] {
+            display: none;
+        }
+
+        .cotizacion-header .info {
+            flex: 1;
+        }
+
+        .cotizacion-header .info div {
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .cotizacion-header .info strong {
+            color: var(--primary-color);
+        }
+
+        .cotizacion-header .fecha {
+            text-align: right;
+            color: var(--primary-color);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .cotizacion-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+            font-size: 12px;
+        }
+
+        .cotizacion-table th {
+            background: var(--sidebar-background);
+            color: var(--sidebar-text);
+            border: 0.5px solid var(--sidebar-border);
+            padding: 8px;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        .cotizacion-table th:nth-child(2) { text-align: center; }
+        .cotizacion-table th:nth-child(3), .cotizacion-table th:nth-child(4) { text-align: right; }
+
+        .cotizacion-table td {
+            border: 0.5px solid #222;
+            padding: 8px;
+            vertical-align: top;
+        }
+
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .total-cell { 
+            font-weight: bold; 
+            color: var(--primary-color); 
+        }
+
+        .cotizacion-sumas {
+            width: 60%;
+            margin: 0 auto 20px auto; /* Reducir de 80px a 20px */
+            font-size: 12px;
+        }
+
+        .cotizacion-sumas td {
+            padding: 4px 8px;
+        }
+
+        .cotizacion-sumas td:first-child {
+            text-align: right;
+            font-weight: bold;
+        }
+
+        .cotizacion-sumas .total-value {
+            text-align: right;
+            color: var(--primary-color);
+            font-weight: bold;
+            min-width: 100px;
+        }
+
+        .cotizacion-sumas .total-row td {
+            border-top: 1px solid var(--primary-color);
+            padding-top: 8px;
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .cotizacion-sumas .total-row .total-value {
+            color: var(--sidebar-active);
+            font-size: 16px;
+            font-weight: 900;
+        }
+
+        .cotizacion-pago {
+            border: 0.5px solid var(--sidebar-background);
+            padding: 12px;
+            margin-bottom: 100px; /* Aumentar de 20px a 60px para más separación */
+            background: var(--background-main);
+            font-size: 13px;
+        }
+
+        .cotizacion-pago div {
+            margin-bottom: 5px;
+        }
+
+        .cotizacion-pago strong {
+            color: var(--primary-color);
+        }
+
+        /* Estilos para términos y condiciones */
+        .cotizacion-terminos {
+            border: 0.5px solid var(--sidebar-background);
+            padding: 12px;
+            margin-bottom: 20px;
+            background: var(--background-main);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .cotizacion-terminos h4 {
+            color: var(--primary-color);
+            font-size: 13px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .cotizacion-terminos p {
+            margin-bottom: 6px;
+            text-align: justify;
+        }
+
+        .cotizacion-terminos ul {
+            margin: 6px 0;
+            padding-left: 20px;
+        }
+
+        .cotizacion-terminos li {
+            margin-bottom: 3px;
+            text-align: justify;
+        }
+
+        .cotizacion-firmas {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            margin-bottom: 20px; /* Agregar margen inferior */
+        }
+
+        .cotizacion-firmas .firma {
+            width: 45%;
+            text-align: center;
+        }
+
+        .cotizacion-firmas .firma .signature-line {
+            border-top: 2px solid var(--sidebar-background);
+            margin-bottom: 8px;
+        }
+
+        .cotizacion-firmas .firma .signature-text {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .pdf-footer {
+            margin-top: auto;
+            flex-shrink: 0;
+            padding-top: 50px;
+        }
+
+        @media (max-width: 768px) {
+            body { 
+                padding: 1rem; 
+            }
+            
+            .cotizaciones-container { 
+                padding: 1rem; 
+            }
+            
+            .items-table { 
+                font-size: 0.8rem; 
+            }
+            
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .clear-form, .download-pdf {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .preview-container .pdf-container {
+                width: 100%;
+                min-width: 300px;
+                padding: 20px;
+                font-size: 12px;
+            }
+            
+            .pdf-header .header-info {
+                flex-direction: column;
+            }
+            
+            .date-info {
+                text-align: left;
+                margin-top: 10px;
+            }
+            
+            .signatures {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .signature {
+                width: 100%;
+            }
+        }
+
+        @media print {
+            .pdf-container {
+                width: 100% !important;
+                min-height: 100vh !important;
+                margin: 0 !important;
+                padding: 20px !important;
+                box-shadow: none !important;
+                border: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cotizaciones-container">
+        <h1>🧾 Generador de Cotizaciones</h1>
+        
+        <form class="cotizacion-form" id="cotizacionForm">
+            <fieldset>
+                <legend>📋 Datos Generales del Cliente</legend>
+                <label>👤 Cliente: 
+                    <input type="text" id="cliente" placeholder="Nombre del cliente">
+                </label>
+                <label>📍 Dirección: 
+                    <input type="text" id="direccion" placeholder="Dirección del cliente">
+                </label>
+                <label>📞 Teléfono: 
+                    <input type="text" id="telefono" placeholder="Número de teléfono">
+                </label>
+                <label>📅 Fecha: 
+                    <input type="date" id="fecha">
+                </label>
+            </fieldset>
+            
+            <fieldset>
+                <legend>🛒 Productos / Servicios</legend>
+                <table class="items-table" id="itemsTable">
+                    <thead>
+                        <tr>
+                            <th>📝 Descripción</th>
+                            <th>🔢 Cantidad</th>
+                            <th>💰 Precio Unitario</th>
+                            <th>💵 Total</th>
+                            <th>🗑️</th>
+                        </tr>
+                    </thead>
+                    <tbody id="itemsBody">
+                    </tbody>
+                </table>
+                <button type="button" class="add-item" onclick="addItemRow()">
+                    ➕ Agregar Producto/Servicio
+                </button>
+            </fieldset>
+            
+            <fieldset>
+                <legend>💳 Datos Sobre las Condiciones de Pago</legend>
+                <label>📄 Emitir cheque a nombre de: 
+                    <input type="text" id="cheque" placeholder="Nombre completo para el cheque">
+                </label>
+                <label>🆔 NIT: 
+                    <input type="text" id="nit" placeholder="Número de identificación tributaria">
+                </label>
+                <label>💵 Forma de Pago: 
+                    <input type="text" id="pago" placeholder="Descripción de la forma de pago">
+                </label>
+                <label>✍️ Firma Empresa: 
+                    <input type="text" id="firmaEmpresa" placeholder="Nombre de la persona que firma" value="Licda. Carmen Concepcion Hernandez">
+                </label>
+                <label class="toggle-label">
+                    <span>💰 Calcular IVA (13%):</span>
+                    <div class="toggle-switch">
+                        <input type="checkbox" id="calcularIva" checked>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+                <label>📝 Comentarios sobre la cotización:
+                    <textarea id="comentarios" rows="4" placeholder="Describe brevemente lo que incluye la cotización"></textarea>
+                </label>
+            </fieldset>
+        </form>
+        
+        <div class="actions">
+            <button class="clear-form" onclick="clearForm()" type="button">
+                🗑️ Limpiar Formulario
+            </button>
+            <button class="download-cotizacion" onclick="downloadCotizacion()" type="button" id="downloadButton" disabled>
+                📄 Descargar Cotización
+            </button>
+        </div>
+        
+        <!-- Mensaje de validación -->
+        <div id="validationMessage" style="display: none; margin: 10px 0; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;">
+            <strong>⚠️ Campos requeridos faltantes:</strong>
+            <ul id="validationList" style="margin: 5px 0 0 20px;"></ul>
+        </div>
+        
+        <h2>👁️ Previsualización</h2>
+        <div class="preview-container">
+            <div id="cotizacion-preview" class="pdf-container">
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script>
+        // Variables globales
+        let items = [];
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si hay datos para cargar desde localStorage
+            const cotizacionParaPDF = localStorage.getItem('cotizacionParaPDF');
+            const generarPDFAutomaticamente = localStorage.getItem('generarPDFAutomaticamente');
+            
+            if (cotizacionParaPDF && generarPDFAutomaticamente === 'true') {
+                // Cargar datos de la cotización
+                try {
+                    const cotizacionData = JSON.parse(cotizacionParaPDF);
+                    cargarCotizacionDesdeDatos(cotizacionData);
+                    
+                    // Limpiar datos del localStorage
+                    localStorage.removeItem('cotizacionParaPDF');
+                    localStorage.removeItem('generarPDFAutomaticamente');
+                    
+                    // Generar PDF automáticamente después de un breve delay
+                    setTimeout(() => {
+                        downloadPDFAlternative();
+                        // Cerrar la ventana después de generar el PDF
+                        setTimeout(() => {
+                            window.close();
+                        }, 2000); // 2 segundos después de generar el PDF
+                    }, 1000);
+                    
+                    return; // No continuar con la inicialización normal
+                } catch (error) {
+                    console.error('Error cargando datos de cotización:', error);
+                    // Limpiar datos corruptos
+                    localStorage.removeItem('cotizacionParaPDF');
+                    localStorage.removeItem('generarPDFAutomaticamente');
+                }
+            }
+            
+            // Inicialización normal
+            // Establecer fecha actual
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('fecha').value = `${year}-${month}-${day}`;
+            
+            // Agregar una fila inicial
+            addItemRow();
+            
+            // Agregar event listeners
+            addEventListeners();
+            
+            // Actualizar vista previa inicial
+            setTimeout(updatePreview, 100);
+            
+            // Validar formulario inicial
+            setTimeout(validateForm, 200);
+        });
+
+        // Función para cargar cotización desde datos
+        function cargarCotizacionDesdeDatos(cotizacionData) {
+            console.log('Cargando datos de cotización:', cotizacionData);
+            
+            // Cargar datos del cliente
+            document.getElementById('cliente').value = cotizacionData.cliente || '';
+            document.getElementById('direccion').value = cotizacionData.direccion || '';
+            document.getElementById('telefono').value = cotizacionData.telefono || '';
+            document.getElementById('fecha').value = cotizacionData.fecha || '';
+            document.getElementById('cheque').value = cotizacionData.cheque || '';
+            document.getElementById('nit').value = cotizacionData.nit || '';
+            document.getElementById('pago').value = cotizacionData.pago || '';
+            document.getElementById('firmaEmpresa').value = cotizacionData.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez';
+            document.getElementById('calcularIva').checked = cotizacionData.calcularIva !== undefined ? cotizacionData.calcularIva : true;
+            document.getElementById('comentarios').value = cotizacionData.comentarios || '';
+            
+            console.log('Fecha cargada:', cotizacionData.fecha);
+            console.log('Campo fecha en el formulario:', document.getElementById('fecha').value);
+            
+            // Cargar items
+            items = cotizacionData.items || [];
+            if (items.length === 0) {
+                addItemRow(); // Agregar al menos una fila vacía
+            }
+            
+            // Renderizar tabla de items
+            renderItemsTable();
+            
+            // Actualizar vista previa
+            updatePreview();
+            
+            // Validar formulario
+            validateForm();
+        }
+
+        // Agregar event listeners
+        function addEventListeners() {
+            const inputs = document.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    updatePreview();
+                    validateForm();
+                });
+                input.addEventListener('change', function() {
+                    updatePreview();
+                    validateForm();
+                });
+                input.addEventListener('keyup', function() {
+                    updatePreview();
+                    validateForm();
+                });
+            });
+
+            // Event listener especial para teléfono
+            document.getElementById('telefono').addEventListener('input', function(e) {
+                formatPhoneNumber(e.target);
+                validateForm();
+            });
+
+            // Event listener para el toggle de IVA
+            document.getElementById('calcularIva').addEventListener('change', function() {
+                updatePreview();
+                console.log('Toggle IVA cambiado:', this.checked);
+            });
+        }
+
+        // Validar formulario
+        function validateForm() {
+            const requiredFields = {
+                'cliente': 'Cliente',
+                'direccion': 'Dirección',
+                'telefono': 'Teléfono',
+                'fecha': 'Fecha',
+                'cheque': 'Emitir cheque a nombre de',
+                'nit': 'NIT',
+                'pago': 'Forma de Pago'
+            };
+
+            const missingFields = [];
+            const downloadButton = document.getElementById('downloadButton');
+            const validationMessage = document.getElementById('validationMessage');
+            const validationList = document.getElementById('validationList');
+
+            // Verificar campos requeridos
+            for (const [fieldId, fieldName] of Object.entries(requiredFields)) {
+                const field = document.getElementById(fieldId);
+                if (!field || !field.value.trim()) {
+                    missingFields.push(fieldName);
+                }
+            }
+
+            // Verificar que haya al menos un producto válido
+            const validItems = getValidItems();
+            if (validItems.length === 0) {
+                missingFields.push('Al menos un producto/servicio');
+            }
+
+            // Actualizar estado del botón y mensaje de validación
+            if (missingFields.length === 0) {
+                downloadButton.disabled = false;
+                validationMessage.style.display = 'none';
+            } else {
+                downloadButton.disabled = true;
+                validationMessage.style.display = 'block';
+                validationList.innerHTML = missingFields.map(field => `<li>${field}</li>`).join('');
+            }
+        }
+
+        // Formatear moneda
+        function formatCurrency(value) {
+            return "$" + Number(value).toLocaleString("en-US", {
+                minimumFractionDigits: 2, 
+                maximumFractionDigits: 2
+            });
+        }
+
+        // Formatear número con comas mientras se escribe
+        function formatNumberInput(input) {
+            let value = input.value.replace(/[^0-9.]/g, '');
+            let parts = value.split('.');
+            
+            // Formatear la parte entera con comas
+            if (parts[0]) {
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+            
+            // Limitar a 2 decimales
+            if (parts[1] && parts[1].length > 2) {
+                parts[1] = parts[1].substring(0, 2);
+            }
+            
+            input.value = parts.join('.');
+        }
+
+        // Formatear teléfono
+        function formatPhoneNumber(input) {
+            let value = input.value.replace(/\D/g, '');
+            
+            if (value.length === 8) {
+                input.value = `${value.substring(0, 4)}-${value.substring(4)}`;
+            } else if (value.length === 11) {
+                input.value = `(${value.substring(0, 3)}) ${value.substring(3, 7)}-${value.substring(7)}`;
+            } else if (value.length >= 12) {
+                const countryCode = value.substring(0, value.length - 8);
+                const remaining = value.substring(value.length - 8);
+                input.value = `+${countryCode} ${remaining.substring(0, 4)}-${remaining.substring(4)}`;
+            } else {
+                input.value = value;
+            }
+        }
+
+        // Agregar fila de item
+        function addItemRow() {
+            const item = {
+                desc: '',
+                qty: 1,
+                unit: 0,
+                total: 0
+            };
+            items.push(item);
+            renderItemsTable();
+            updatePreview();
+            validateForm();
+        }
+
+        // Remover item
+        function removeItem(index) {
+            items.splice(index, 1);
+            renderItemsTable();
+            updatePreview();
+            validateForm();
+        }
+
+        // Renderizar tabla de items
+        function renderItemsTable() {
+            const tbody = document.getElementById('itemsBody');
+            tbody.innerHTML = '';
+            
+            items.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <textarea rows="2" placeholder="Descripción del producto o servicio..." 
+                                 oninput="updateItem(${index}, 'desc', this.value); updatePreview(); validateForm();">${item.desc}</textarea>
+                    </td>
+                    <td>
+                        <input type="number" min="1" placeholder="1" value="${item.qty}"
+                               oninput="updateItem(${index}, 'qty', this.value); renderItemsTable(); updatePreview(); validateForm();">
+                    </td>
+                    <td>
+                        <input type="text" min="0" step="0.01" placeholder="0.00" value="${item.unit > 0 ? item.unit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ''}"
+                               oninput="formatNumberInput(this); updateItemFromFormattedInput(${index}, 'unit', this.value); updatePreview(); validateForm();">
+                    </td>
+                    <td class="total">${formatCurrency(item.total)}</td>
+                    <td>
+                        <button type="button" class="remove-item" onclick="removeItem(${index})" title="Eliminar fila">✕</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Actualizar item
+        function updateItem(index, field, value) {
+            const item = items[index];
+            item[field] = field === 'qty' || field === 'unit' ? Number(value) || 0 : value;
+            
+            if (field === 'qty' || field === 'unit') {
+                item.total = item.qty * item.unit;
+                // Actualizar el total en la tabla sin re-renderizar toda la fila
+                const rows = document.querySelectorAll('#itemsBody tr');
+                if (rows[index]) {
+                    const totalCell = rows[index].querySelector('.total');
+                    if (totalCell) {
+                        totalCell.textContent = formatCurrency(item.total);
+                    }
+                }
+            }
+        }
+
+        // Actualizar item desde input formateado (con comas)
+        function updateItemFromFormattedInput(index, field, formattedValue) {
+            const item = items[index];
+            // Convertir valor formateado (con comas) a número
+            const numericValue = parseFloat(formattedValue.replace(/,/g, '')) || 0;
+            item[field] = numericValue;
+            
+            if (field === 'qty' || field === 'unit') {
+                item.total = item.qty * item.unit;
+                // Actualizar el total en la tabla sin re-renderizar toda la fila
+                const rows = document.querySelectorAll('#itemsBody tr');
+                if (rows[index]) {
+                    const totalCell = rows[index].querySelector('.total');
+                    if (totalCell) {
+                        totalCell.textContent = formatCurrency(item.total);
+                    }
+                }
+            }
+        }
+
+        // Obtener items válidos para mostrar en tabla (requiere descripción)
+        function getValidItems() {
+            return items.filter(item => 
+                item.desc.trim() !== "" && item.qty > 0 && item.unit >= 0
+            );
+        }
+
+        // Items para cálculo de totales (no requiere descripción)
+        function getItemsForTotals() {
+            return items.filter(item => item.qty > 0 && item.unit >= 0);
+        }
+
+        // Limpiar formulario
+        function clearForm() {
+            document.getElementById('cliente').value = '';
+            document.getElementById('direccion').value = '';
+            document.getElementById('telefono').value = '';
+            document.getElementById('cheque').value = '';
+            document.getElementById('nit').value = '';
+            document.getElementById('pago').value = '';
+            document.getElementById('firmaEmpresa').value = 'Licda. Carmen Concepcion Hernandez';
+            document.getElementById('comentarios').value = '';
+            document.getElementById('calcularIva').checked = true;
+            
+            // Establecer fecha actual
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            document.getElementById('fecha').value = `${year}-${month}-${day}`;
+            
+            items = [];
+            addItemRow();
+            updatePreview();
+            validateForm();
+        }
+
+        // Actualizar previsualización
+        function updatePreview() {
+            const validItems = getValidItems();
+            const itemsForTotals = getItemsForTotals();
+            
+            // Obtener valores del formulario
+            const cliente = document.getElementById('cliente').value;
+            const direccion = document.getElementById('direccion').value;
+            const telefono = document.getElementById('telefono').value;
+            const fecha = document.getElementById('fecha').value;
+            const cheque = document.getElementById('cheque').value;
+            const nit = document.getElementById('nit').value;
+            const pago = document.getElementById('pago').value;
+            const firmaEmpresa = document.getElementById('firmaEmpresa').value;
+            const comentarios = document.getElementById('comentarios').value;
+            
+            // Formatear fecha
+            const fechaFormateada = fecha ? 
+                new Date(fecha + 'T00:00:00').toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "long", 
+                    year: "numeric"
+                }) : "";
+
+            // Calcular totales
+            const subTotal = itemsForTotals.reduce((sum, item) => sum + item.total, 0);
+            const calcularIva = document.getElementById('calcularIva').checked;
+            const iva = calcularIva ? subTotal * 0.13 : 0;
+            const total = subTotal + iva;
+
+            // Generar HTML
+            const preview = document.getElementById('cotizacion-preview');
+            preview.innerHTML = `
+                <div class="watermark">
+                    <img src="/favicon.jpg" alt="Lumina" style="width: 100%; height: 100%; object-fit: contain;">
+                </div>
+                <div class="pdf-content">
+                    <div class="titulo">MARIO ROBERTO GOMEZ MARTINEZ</div>
+                    <div class="subtitulo">Servicios Informáticos en General y Desarrollo de Software a la Medida</div>
+                    <div class="cotizacion-header">
+                        <div class="info">
+                            <div><strong>Cliente:</strong> ${cliente || 'No especificado'}</div>
+                            <div><strong>Dirección:</strong> ${direccion || 'No especificado'}</div>
+                            <div><strong>Teléfono:</strong> ${telefono || 'No especificado'}</div>
+                        </div>
+                        <div class="fecha">
+                            <strong>${fechaFormateada}</strong>
+                        </div>
+                    </div>
+                    
+                    <table class="cotizacion-table">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Cantidad</th>
+                                <th>Precio Unitario</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${validItems.map(item => `
+                                <tr>
+                                    <td>${item.desc.replace(/\n/g, "<br>")}</td>
+                                    <td class="text-center">${item.qty}</td>
+                                    <td class="text-right">${formatCurrency(item.unit)}</td>
+                                    <td class="text-right total-cell">${formatCurrency(item.total)}</td>
+                                </tr>
+                            `).join("")}
+                            ${validItems.length === 0 ? '<tr><td colspan="4" class="text-center">No hay productos agregados</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pdf-footer">
+                    <div class="cotizacion-comentarios">
+                        <strong>Comentarios:</strong>
+                        <p>${comentarios ? comentarios.replace(/\n/g, "<br>") : '______________________________'}</p>
+                    </div>
+                    <table class="cotizacion-sumas">
+                        <tr>
+                            <td><strong>SUMAS</strong></td>
+                            <td class="total-value">${formatCurrency(subTotal)}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>SUB TOTAL</strong></td>
+                            <td class="total-value">${formatCurrency(subTotal)}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>IVA ${calcularIva ? '(13%)' : '(No aplica)'}</strong></td>
+                            <td class="total-value">${formatCurrency(iva)}</td>
+                        </tr>
+                        <tr class="total-row">
+                            <td><strong>TOTAL</strong></td>
+                            <td class="total-value">${formatCurrency(total)}</td>
+                        </tr>
+                    </table>
+                    <!--
+                    <div class="cotizacion-pago">
+                        <div><strong>Emitir cheque a nombre de:</strong> ${cheque || 'No especificado'}</div>
+                        <div><strong>NIT:</strong> ${nit || 'No especificado'}</div>
+                        <div><strong>FORMA DE PAGO:</strong> ${pago || 'No especificado'}</div>
+                        <p>Esta cotización tiene una validez de 30 días calendario a partir de la fecha de emisión.</p>
+                        <p>Términos y condiciones aplican. Para más información consulte nuestros <a href="/terms" target="_blank">Términos y condiciones</a> o por favor contáctenos.</p>
+                    </div>
+                    -->
+                    
+                    <!-- <div class="cotizacion-terminos">
+                        <h4>TÉRMINOS Y CONDICIONES</h4>
+                        <p>Esta cotización tiene una validez de 30 días calendario a partir de la fecha de emisión.</p>
+                        <p>Términos y condiciones aplican. Para más información consulte nuestros <a href="/terms" target="_blank">Términos y condiciones</a> o por favor contáctenos.</p>
+                    </div> -->
+                    
+                    <div class="cotizacion-firmas">
+                        <div class="firma">
+                            <div class="signature-line"></div>
+                            <div class="signature-text">NOMBRE Y FIRMA DE ACEPTACIÓN</div>
+                        </div>
+                        <div class="firma">
+                            <div class="signature-line"></div>
+                            <div class="signature-text">${firmaEmpresa || 'Tec. Ing. Mario Roberto Gomez Martinez'}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Descargar PDF
+        function downloadPDF() {
+            const element = document.getElementById('cotizacion-preview');
+            
+            // Configuración específica para una sola página
+            const opt = {
+                margin: 0,
+                filename: 'cotizacion.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 1,
+                    useCORS: true,
+                    allowTaint: true,
+                    width: 816,
+                    height: 1056
+                },
+                jsPDF: { 
+                    unit: 'px', 
+                    format: [816, 1056],
+                    orientation: 'portrait',
+                    compress: true
+                }
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }
+
+        // Función alternativa para PDF de una sola página
+        function downloadPDFAlternative() {
+            const preview = document.getElementById('cotizacion-preview');
+            
+            // Forzar tamaño exacto A4 antes de exportar
+            preview.style.width = "794px";
+            preview.style.height = "1123px";
+            preview.style.minHeight = "unset";
+            
+            // Asegurarnos de que la fecha se actualice antes de generar el PDF
+            updatePreview();
+            
+            const opt = {
+                margin: 0,
+                filename: 'cotizacion-mr.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 1.5, useCORS: true, scrollY: 0 },
+                jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(preview).save();
+        }
+
+        // Descargar cotización
+        function downloadCotizacion() {
+            validateForm();
+
+            const downloadButton = document.getElementById('downloadButton');
+            if (downloadButton.disabled) {
+                alert('Por favor complete todos los campos requeridos antes de descargar la cotización.');
+                return;
+            }
+
+            updatePreview();
+            downloadPDFAlternative();
+        }
+    </script>
+</body>
+</html> 
