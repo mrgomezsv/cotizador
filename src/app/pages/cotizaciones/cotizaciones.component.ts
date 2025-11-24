@@ -60,6 +60,13 @@ export class CotizacionesComponent implements OnInit {
   creatingClient = false;
   showSuccessModal = false;
 
+  // Modal de edición de cotizaciones
+  showEditModal = false;
+  editingCotizacion: Cotizacion | null = null;
+  editForm: Partial<Cotizacion> = {};
+  editFormErrors: Record<string, string> = {};
+  savingCotizacion = false;
+
   ngOnInit() {
     // Cargar cotizaciones automáticamente solo en el navegador
     if (isPlatformBrowser(this.platformId as object)) {
@@ -77,10 +84,15 @@ export class CotizacionesComponent implements OnInit {
         // console.log('🚨 [LOAD] Cotizaciones recibidas:', cotizaciones);
         // alert(`🚨 RECIBIDAS ${cotizaciones.length} COTIZACIONES`);
 
-        // Mapear estados del backend a los del frontend
-        const mapped = cotizaciones.map(c => (
-          c && c.status ? { ...c, status: this.mapBackendStatusToFrontend(c.status) } : c
-        ));
+        // Mapear estados del backend a los del frontend y asegurar que el ID esté disponible
+        const mapped = cotizaciones.map(c => {
+          const cotizacion = c && c.status ? { ...c, status: this.mapBackendStatusToFrontend(c.status) } : c;
+          // Asegurar que el ID esté disponible (puede venir como _id del backend)
+          if (cotizacion && !cotizacion.id && (cotizacion as any)._id) {
+            cotizacion.id = (cotizacion as any)._id;
+          }
+          return cotizacion;
+        });
 
         this.cotizaciones = mapped;
         this.filteredCotizaciones = mapped;
@@ -145,6 +157,10 @@ export class CotizacionesComponent implements OnInit {
 
   // Seleccionar cotización
   selectCotizacion(cotizacion: Cotizacion) {
+    // Asegurar que el ID esté disponible (puede venir como _id del backend)
+    if (cotizacion && !cotizacion.id && (cotizacion as any)._id) {
+      cotizacion.id = (cotizacion as any)._id;
+    }
     this.selectedCotizacion = cotizacion;
   }
 
@@ -214,10 +230,12 @@ export class CotizacionesComponent implements OnInit {
         nit: this.selectedCotizacion.nit || '',
         pago: this.selectedCotizacion.pago || '',
         firmaEmpresa: this.selectedCotizacion.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez',
+        comentarios: this.selectedCotizacion.comentarios || '',
         items: this.selectedCotizacion.items,
         subTotal: this.selectedCotizacion.subTotal,
         iva: this.selectedCotizacion.iva,
-        total: this.selectedCotizacion.total
+        total: this.selectedCotizacion.total,
+        calcularIva: this.selectedCotizacion.calcularIva || false
       };
 
       console.log('Datos de cotización para PDF:', cotizacionData);
@@ -600,5 +618,213 @@ export class CotizacionesComponent implements OnInit {
       'rejected': 'RECHAZADA'
     };
     return map[backendStatus] || backendStatus;
+  }
+
+  // Métodos para edición de cotizaciones
+
+  // Abrir modal de edición
+  openEditModal(cotizacion: Cotizacion) {
+    // Asegurar que el ID esté disponible (puede venir como _id del backend)
+    if (cotizacion && !cotizacion.id && (cotizacion as any)._id) {
+      cotizacion.id = (cotizacion as any)._id;
+    }
+    this.editingCotizacion = cotizacion;
+    // Crear una copia profunda de la cotización para editar
+    this.editForm = {
+      cliente: cotizacion.cliente,
+      direccion: cotizacion.direccion || '',
+      telefono: cotizacion.telefono || '',
+      fecha: cotizacion.fecha,
+      cheque: cotizacion.cheque || '',
+      nit: cotizacion.nit || '',
+      pago: cotizacion.pago || '',
+      firmaEmpresa: cotizacion.firmaEmpresa,
+      comentarios: cotizacion.comentarios || '',
+      items: JSON.parse(JSON.stringify(cotizacion.items)), // Copia profunda de items
+      subTotal: cotizacion.subTotal,
+      iva: cotizacion.iva,
+      total: cotizacion.total,
+      calcularIva: cotizacion.calcularIva || false
+    };
+    this.editFormErrors = {};
+    this.showEditModal = true;
+  }
+
+  // Cerrar modal de edición
+  closeEditModal() {
+    this.showEditModal = false;
+    this.editingCotizacion = null;
+    this.editForm = {};
+    this.editFormErrors = {};
+  }
+
+  // Agregar nuevo item
+  addItem() {
+    if (!this.editForm.items) {
+      this.editForm.items = [];
+    }
+    this.editForm.items.push({
+      desc: '',
+      qty: 1,
+      unit: 0,
+      total: 0
+    });
+    this.calculateTotals();
+  }
+
+  // Eliminar item
+  removeItem(index: number) {
+    if (this.editForm.items && this.editForm.items.length > 0) {
+      this.editForm.items.splice(index, 1);
+      this.calculateTotals();
+    }
+  }
+
+  // Calcular totales cuando cambian los items
+  calculateTotals() {
+    if (!this.editForm.items) return;
+
+    // Calcular subtotal
+    this.editForm.subTotal = this.editForm.items.reduce((sum, item) => {
+      const itemTotal = item.qty * item.unit;
+      item.total = itemTotal;
+      return sum + itemTotal;
+    }, 0);
+
+    // Calcular IVA si está habilitado
+    if (this.editForm.calcularIva) {
+      this.editForm.iva = this.editForm.subTotal * 0.13;
+    } else {
+      this.editForm.iva = 0;
+    }
+
+    // Calcular total
+    this.editForm.total = this.editForm.subTotal + (this.editForm.iva || 0);
+  }
+
+  // Validar formulario de edición
+  validateEditForm(): boolean {
+    this.editFormErrors = {};
+
+    if (!this.editForm.cliente?.trim()) {
+      this.editFormErrors['cliente'] = 'El nombre del cliente es requerido';
+    }
+
+    if (!this.editForm.fecha?.trim()) {
+      this.editFormErrors['fecha'] = 'La fecha es requerida';
+    }
+
+    if (!this.editForm.firmaEmpresa?.trim()) {
+      this.editFormErrors['firmaEmpresa'] = 'La firma de la empresa es requerida';
+    }
+
+    if (!this.editForm.items || this.editForm.items.length === 0) {
+      this.editFormErrors['items'] = 'Debe agregar al menos un item';
+    } else {
+      // Validar que todos los items tengan descripción
+      const itemsInvalidos = this.editForm.items.some(item => !item.desc?.trim());
+      if (itemsInvalidos) {
+        this.editFormErrors['items'] = 'Todos los items deben tener una descripción';
+      }
+    }
+
+    return Object.keys(this.editFormErrors).length === 0;
+  }
+
+  // Guardar cambios
+  saveCotizacion() {
+    console.log('💾 Iniciando guardado de cotización...');
+    console.log('📋 Formulario:', this.editForm);
+    console.log('🆔 ID de cotización:', this.editingCotizacion?.id);
+
+    if (!this.validateEditForm()) {
+      console.error('❌ Validación fallida:', this.editFormErrors);
+      return;
+    }
+
+    if (!this.editingCotizacion?.id) {
+      console.error('❌ No hay ID de cotización');
+      this.modalService.error('Error', 'No se pudo identificar la cotización a actualizar.');
+      return;
+    }
+
+    this.savingCotizacion = true;
+
+    // Preparar datos para enviar
+    const updateData: Partial<Cotizacion> = {
+      cliente: this.editForm.cliente,
+      direccion: this.editForm.direccion || '',
+      telefono: this.editForm.telefono || '',
+      fecha: this.editForm.fecha,
+      cheque: this.editForm.cheque || '',
+      nit: this.editForm.nit || '',
+      pago: this.editForm.pago || '',
+      firmaEmpresa: this.editForm.firmaEmpresa,
+      comentarios: this.editForm.comentarios || '',
+      items: this.editForm.items,
+      subTotal: this.editForm.subTotal || 0,
+      iva: this.editForm.iva || 0,
+      total: this.editForm.total || 0,
+      calcularIva: this.editForm.calcularIva || false
+    };
+
+    console.log('📤 Datos a enviar:', updateData);
+
+    this.cotizacionService.update(this.editingCotizacion.id, updateData).subscribe({
+      next: (updatedCotizacion) => {
+        console.log('✅ Cotización actualizada exitosamente:', updatedCotizacion);
+        
+        // Mapear estado del backend a frontend
+        const mappedUpdated = updatedCotizacion && updatedCotizacion.status
+          ? { ...updatedCotizacion, status: this.mapBackendStatusToFrontend(updatedCotizacion.status) }
+          : updatedCotizacion;
+
+        // Actualizar en las listas
+        const index = this.cotizaciones.findIndex(c => c.id === this.editingCotizacion?.id);
+        if (index !== -1) {
+          this.cotizaciones[index] = mappedUpdated as Cotizacion;
+        }
+
+        const filteredIndex = this.filteredCotizaciones.findIndex(c => c.id === this.editingCotizacion?.id);
+        if (filteredIndex !== -1) {
+          this.filteredCotizaciones[filteredIndex] = mappedUpdated as Cotizacion;
+        }
+
+        // Si es la cotización seleccionada, actualizarla
+        if (this.selectedCotizacion?.id === this.editingCotizacion?.id) {
+          this.selectedCotizacion = mappedUpdated as Cotizacion;
+        }
+
+        this.savingCotizacion = false;
+        this.closeEditModal();
+        this.modalService.success('Cotización actualizada', 'Los cambios se han guardado exitosamente');
+        
+        // Recargar la lista para asegurar que todo esté actualizado
+        this.loadCotizaciones();
+      },
+      error: (error) => {
+        console.error('❌ Error completo al actualizar cotización:', error);
+        console.error('❌ Error details:', {
+          status: error?.status,
+          statusText: error?.statusText,
+          message: error?.message,
+          error: error?.error,
+          url: error?.url
+        });
+        
+        this.savingCotizacion = false;
+        
+        let errorMessage = 'No se pudo actualizar la cotización.';
+        if (error?.error?.details) {
+          errorMessage += ` ${error.error.details}`;
+        } else if (error?.error?.error) {
+          errorMessage += ` ${error.error.error}`;
+        } else if (error?.message) {
+          errorMessage += ` ${error.message}`;
+        }
+        
+        this.modalService.error('Error al actualizar', errorMessage);
+      }
+    });
   }
 }

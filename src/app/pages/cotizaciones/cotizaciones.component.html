@@ -107,6 +107,9 @@
       <div class="detail-header">
         <h3>Detalle de la Cotización</h3>
         <div class="detail-actions">
+          <button class="edit-btn" (click)="openEditModal(selectedCotizacion)" title="Editar cotización">
+            ✏️ Editar
+          </button>
           <button class="download-pdf-btn" (click)="downloadPDF()" title="Descargar PDF">
             📄 Descargar PDF
           </button>
@@ -212,6 +215,13 @@
               <strong>Forma de Pago:</strong>
               <span>{{ selectedCotizacion.pago }}</span>
             </div>
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedCotizacion.comentarios">
+          <h4>Comentarios</h4>
+          <div class="comentarios-content">
+            <p>{{ selectedCotizacion.comentarios }}</p>
           </div>
         </div>
 
@@ -404,6 +414,268 @@
                   tabindex="0">
             <i class="fas fa-spinner fa-spin" *ngIf="creatingClient"></i>
             {{ creatingClient ? 'Registrando...' : 'Registrar Cliente' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edición de Cotización -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content edit-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>✏️ Editar Cotización</h3>
+      <button class="modal-close" 
+              (click)="closeEditModal()"
+              (keyup.enter)="closeEditModal()"
+              (keyup.space)="closeEditModal()"
+              tabindex="0"
+              aria-label="Cerrar modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form (ngSubmit)="saveCotizacion()">
+        <!-- Información del Cliente -->
+        <div class="form-section">
+          <h4>Información del Cliente</h4>
+          
+          <div class="form-group">
+            <label for="edit-cliente">Cliente *</label>
+            <input 
+              type="text" 
+              id="edit-cliente"
+              [(ngModel)]="editForm.cliente" 
+              name="edit-cliente"
+              class="form-control"
+              [class.error]="editFormErrors['cliente']"
+              placeholder="Nombre del cliente"
+              required>
+            <div class="error-message" *ngIf="editFormErrors['cliente']">
+              {{ editFormErrors['cliente'] }}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-direccion">Dirección</label>
+              <input 
+                type="text" 
+                id="edit-direccion"
+                [(ngModel)]="editForm.direccion" 
+                name="edit-direccion"
+                class="form-control"
+                placeholder="Dirección del cliente">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-telefono">Teléfono</label>
+              <input 
+                type="tel" 
+                id="edit-telefono"
+                [(ngModel)]="editForm.telefono" 
+                name="edit-telefono"
+                class="form-control"
+                placeholder="Teléfono">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-fecha">Fecha *</label>
+              <input 
+                type="date" 
+                id="edit-fecha"
+                [(ngModel)]="editForm.fecha" 
+                name="edit-fecha"
+                class="form-control"
+                [class.error]="editFormErrors['fecha']"
+                required>
+              <div class="error-message" *ngIf="editFormErrors['fecha']">
+                {{ editFormErrors['fecha'] }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-firmaEmpresa">Firma Empresa *</label>
+              <input 
+                type="text" 
+                id="edit-firmaEmpresa"
+                [(ngModel)]="editForm.firmaEmpresa" 
+                name="edit-firmaEmpresa"
+                class="form-control"
+                [class.error]="editFormErrors['firmaEmpresa']"
+                placeholder="Nombre de quien firma"
+                required>
+              <div class="error-message" *ngIf="editFormErrors['firmaEmpresa']">
+                {{ editFormErrors['firmaEmpresa'] }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de Pago -->
+        <div class="form-section">
+          <h4>Información de Pago</h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-cheque">Cheque a nombre de</label>
+              <input 
+                type="text" 
+                id="edit-cheque"
+                [(ngModel)]="editForm.cheque" 
+                name="edit-cheque"
+                class="form-control"
+                placeholder="Nombre para el cheque">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-nit">NIT</label>
+              <input 
+                type="text" 
+                id="edit-nit"
+                [(ngModel)]="editForm.nit" 
+                name="edit-nit"
+                class="form-control"
+                placeholder="NIT">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-pago">Forma de Pago</label>
+              <input 
+                type="text" 
+                id="edit-pago"
+                [(ngModel)]="editForm.pago" 
+                name="edit-pago"
+                class="form-control"
+                placeholder="Forma de pago">
+            </div>
+          </div>
+        </div>
+
+        <!-- Comentarios -->
+        <div class="form-section">
+          <h4>Comentarios</h4>
+          
+          <div class="form-group">
+            <label for="edit-comentarios">Comentarios sobre la cotización</label>
+            <textarea 
+              id="edit-comentarios"
+              [(ngModel)]="editForm.comentarios" 
+              name="edit-comentarios"
+              class="form-control"
+              rows="4"
+              placeholder="Describe brevemente lo que incluye la cotización, servicios adicionales, condiciones especiales, etc."></textarea>
+            <div class="form-text">
+              Los comentarios aparecerán en el detalle de la cotización y en el PDF generado.
+            </div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="form-section">
+          <div class="section-header">
+            <h4>Productos/Servicios</h4>
+            <button type="button" class="btn-add-item" (click)="addItem()">
+              <i class="fas fa-plus"></i> Agregar Item
+            </button>
+          </div>
+
+          <div class="error-message" *ngIf="editFormErrors['items']">
+            {{ editFormErrors['items'] }}
+          </div>
+
+          <div class="items-edit-list" *ngIf="editForm.items">
+            <div class="item-edit-row" *ngFor="let item of editForm.items; let i = index">
+              <div class="item-desc">
+                <input 
+                  type="text" 
+                  [(ngModel)]="item.desc" 
+                  [name]="'item-desc-' + i"
+                  class="form-control"
+                  placeholder="Descripción"
+                  (input)="calculateTotals()">
+              </div>
+              <div class="item-qty">
+                <input 
+                  type="number" 
+                  [(ngModel)]="item.qty" 
+                  [name]="'item-qty-' + i"
+                  class="form-control"
+                  min="1"
+                  step="1"
+                  (input)="calculateTotals()">
+              </div>
+              <div class="item-unit">
+                <input 
+                  type="number" 
+                  [(ngModel)]="item.unit" 
+                  [name]="'item-unit-' + i"
+                  class="form-control"
+                  min="0"
+                  step="0.01"
+                  (input)="calculateTotals()">
+              </div>
+              <div class="item-total">
+                <span>{{ formatCurrency(item.total) }}</span>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="btn-remove-item" (click)="removeItem(i)" title="Eliminar item">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totales -->
+        <div class="form-section">
+          <h4>Totales</h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="editForm.calcularIva" 
+                  name="edit-calcularIva"
+                  (change)="calculateTotals()">
+                Calcular IVA (13%)
+              </label>
+            </div>
+          </div>
+
+          <div class="totals-display">
+            <div class="total-row">
+              <strong>Subtotal:</strong>
+              <span>{{ formatCurrency(editForm.subTotal || 0) }}</span>
+            </div>
+            <div class="total-row">
+              <strong>IVA:</strong>
+              <span>{{ formatCurrency(editForm.iva || 0) }}</span>
+            </div>
+            <div class="total-row total-final">
+              <strong>Total:</strong>
+              <span>{{ formatCurrency(editForm.total || 0) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" 
+                  class="btn-secondary" 
+                  (click)="closeEditModal()"
+                  [disabled]="savingCotizacion">
+            Cancelar
+          </button>
+          <button type="submit" 
+                  class="btn-primary" 
+                  [disabled]="savingCotizacion">
+            <i class="fas fa-spinner fa-spin" *ngIf="savingCotizacion"></i>
+            {{ savingCotizacion ? 'Guardando...' : 'Guardar Cambios' }}
           </button>
         </div>
       </form>
