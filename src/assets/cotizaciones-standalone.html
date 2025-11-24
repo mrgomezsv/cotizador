@@ -410,7 +410,8 @@
             border: 0.5px solid var(--sidebar-background);
             background: var(--background-main);
             padding: 12px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+            margin-top: 10px;
             font-size: 13px;
         }
 
@@ -477,7 +478,7 @@
 
         .cotizacion-sumas {
             width: 60%;
-            margin: 0 auto 20px auto; /* Reducir de 80px a 20px */
+            margin: 0 auto 30px auto;
             font-size: 12px;
         }
 
@@ -584,7 +585,7 @@
         .pdf-footer {
             margin-top: auto;
             flex-shrink: 0;
-            padding-top: 50px;
+            padding-top: 40px;
         }
 
         @media (max-width: 768px) {
@@ -1114,6 +1115,7 @@
                 <div class="pdf-content">
                     <div class="titulo">MARIO ROBERTO GOMEZ MARTINEZ</div>
                     <div class="subtitulo">Servicios Informáticos en General y Desarrollo de Software a la Medida</div>
+                    <div class="subtitulo">Cel. 7756-3510  email: mrgomez.dev@gmail.com</div>
                     <div class="cotizacion-header">
                         <div class="info">
                             <div><strong>Cliente:</strong> ${cliente || 'No especificado'}</div>
@@ -1148,45 +1150,48 @@
                     </table>
                 </div>
                 
+                <!-- Comentarios y Totales - Movidos más cerca de la tabla -->
+                <div class="cotizacion-comentarios">
+                    <strong>Comentarios:</strong>
+                    <p>${comentarios ? comentarios.replace(/\n/g, "<br>") : '______________________________'}</p>
+                </div>
+                <table class="cotizacion-sumas">
+                    <tr>
+                        <td><strong>SUMAS</strong></td>
+                        <td class="total-value">${formatCurrency(subTotal)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>SUB TOTAL</strong></td>
+                        <td class="total-value">${formatCurrency(subTotal)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>IVA ${calcularIva ? '(13%)' : '(No aplica)'}</strong></td>
+                        <td class="total-value">${formatCurrency(iva)}</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>TOTAL</strong></td>
+                        <td class="total-value">${formatCurrency(total)}</td>
+                    </tr>
+                </table>
+                
+                <!--
+                <div class="cotizacion-pago">
+                    <div><strong>Emitir cheque a nombre de:</strong> ${cheque || 'No especificado'}</div>
+                    <div><strong>NIT:</strong> ${nit || 'No especificado'}</div>
+                    <div><strong>FORMA DE PAGO:</strong> ${pago || 'No especificado'}</div>
+                    <p>Esta cotización tiene una validez de 30 días calendario a partir de la fecha de emisión.</p>
+                    <p>Términos y condiciones aplican. Para más información consulte nuestros <a href="/terms" target="_blank">Términos y condiciones</a> o por favor contáctenos.</p>
+                </div>
+                -->
+                
+                <!-- <div class="cotizacion-terminos">
+                    <h4>TÉRMINOS Y CONDICIONES</h4>
+                    <p>Esta cotización tiene una validez de 30 días calendario a partir de la fecha de emisión.</p>
+                    <p>Términos y condiciones aplican. Para más información consulte nuestros <a href="/terms" target="_blank">Términos y condiciones</a> o por favor contáctenos.</p>
+                </div> -->
+                
+                <!-- Firmas - Mantenidas en su posición -->
                 <div class="pdf-footer">
-                    <div class="cotizacion-comentarios">
-                        <strong>Comentarios:</strong>
-                        <p>${comentarios ? comentarios.replace(/\n/g, "<br>") : '______________________________'}</p>
-                    </div>
-                    <table class="cotizacion-sumas">
-                        <tr>
-                            <td><strong>SUMAS</strong></td>
-                            <td class="total-value">${formatCurrency(subTotal)}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>SUB TOTAL</strong></td>
-                            <td class="total-value">${formatCurrency(subTotal)}</td>
-                        </tr>
-                        <tr>
-                            <td><strong>IVA ${calcularIva ? '(13%)' : '(No aplica)'}</strong></td>
-                            <td class="total-value">${formatCurrency(iva)}</td>
-                        </tr>
-                        <tr class="total-row">
-                            <td><strong>TOTAL</strong></td>
-                            <td class="total-value">${formatCurrency(total)}</td>
-                        </tr>
-                    </table>
-                    <!--
-                    <div class="cotizacion-pago">
-                        <div><strong>Emitir cheque a nombre de:</strong> ${cheque || 'No especificado'}</div>
-                        <div><strong>NIT:</strong> ${nit || 'No especificado'}</div>
-                        <div><strong>FORMA DE PAGO:</strong> ${pago || 'No especificado'}</div>
-                        <p>Esta cotización tiene una validez de 30 días calendario a partir de la fecha de emisión.</p>
-                        <p>Términos y condiciones aplican. Para más información consulte nuestros <a href="/terms" target="_blank">Términos y condiciones</a> o por favor contáctenos.</p>
-                    </div>
-                    -->
-                    
-                    <!-- <div class="cotizacion-terminos">
-                        <h4>TÉRMINOS Y CONDICIONES</h4>
-                        <p>Esta cotización tiene una validez de 30 días calendario a partir de la fecha de emisión.</p>
-                        <p>Términos y condiciones aplican. Para más información consulte nuestros <a href="/terms" target="_blank">Términos y condiciones</a> o por favor contáctenos.</p>
-                    </div> -->
-                    
                     <div class="cotizacion-firmas">
                         <div class="firma">
                             <div class="signature-line"></div>
