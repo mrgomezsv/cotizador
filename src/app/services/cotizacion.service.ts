@@ -38,6 +38,7 @@ export interface Cotizacion {
   nit?: string;
   pago?: string;
   firmaEmpresa: string;
+  comentarios?: string;
   items: CotizacionItem[];
   subTotal: number;
   iva: number;
@@ -75,11 +76,17 @@ export class CotizacionService {
       console.log('🔑 Token obtenido para cotizaciones:', token ? 'SÍ' : 'NO');
     }
     
-    const headers = new HttpHeaders({
+    const headersConfig: any = {
       'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': `Bearer ${token}`
-    });
+      'Accept': 'application/json'
+    };
+    
+    // Solo agregar Authorization si hay token
+    if (token) {
+      headersConfig['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const headers = new HttpHeaders(headersConfig);
     
     console.log('📤 Headers de cotizaciones:', {
       'Content-Type': headers.get('Content-Type'),
@@ -111,7 +118,11 @@ export class CotizacionService {
   // Actualizar una cotización
   update(id: string, cotizacion: Partial<Cotizacion>): Observable<Cotizacion> {
     console.log('✏️ Actualizando cotización:', id);
-    return this.http.put<Cotizacion>(`${this.apiUrl}${id}`, cotizacion, { headers: this.getAuthHeaders() });
+    console.log('📤 Datos a enviar:', cotizacion);
+    // Asegurar que no haya doble barra en la URL
+    const url = `${this.apiUrl.replace(/\/$/, '')}/${id}`;
+    console.log('🔗 URL completa:', url);
+    return this.http.put<Cotizacion>(url, cotizacion, { headers: this.getAuthHeaders() });
   }
 
   // Eliminar una cotización
