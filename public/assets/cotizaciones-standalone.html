@@ -662,8 +662,9 @@
                 <label>📍 Dirección: 
                     <input type="text" id="direccion" placeholder="Dirección del cliente">
                 </label>
-                <label>📞 Teléfono: 
-                    <input type="text" id="telefono" placeholder="Número de teléfono">
+                <label>📅 Fecha: 
+                    <input type="date" id="fecha">
+                </label>
                 <input type="hidden" id="folio">
             </fieldset>
             
@@ -743,37 +744,42 @@
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar si hay datos para cargar desde localStorage
+            // Verificar si hay datos en el hash (más confiable para iframes)
+            const hash = window.location.hash;
+            if (hash.startsWith('#data=')) {
+                try {
+                    const encodedData = hash.substring(6);
+                    const cotizacionData = JSON.parse(decodeURIComponent(encodedData));
+                    cargarCotizacionDesdeDatos(cotizacionData);
+                    
+                    // Generar PDF automáticamente
+                    setTimeout(() => {
+                        downloadPDFAlternative();
+                        // No cerramos si está en un iframe (el parent lo manejará o se quedará ahí)
+                    }, 1000);
+                    return;
+                } catch (e) {
+                    console.error('Error parseando datos del hash:', e);
+                }
+            }
+
+            // Fallback a localStorage
             const cotizacionParaPDF = localStorage.getItem('cotizacionParaPDF');
             const generarPDFAutomaticamente = localStorage.getItem('generarPDFAutomaticamente');
             
             if (cotizacionParaPDF && generarPDFAutomaticamente === 'true') {
-                // Cargar datos de la cotización
                 try {
                     const cotizacionData = JSON.parse(cotizacionParaPDF);
                     cargarCotizacionDesdeDatos(cotizacionData);
-                    
-                    // Limpiar datos del localStorage
                     localStorage.removeItem('cotizacionParaPDF');
                     localStorage.removeItem('generarPDFAutomaticamente');
                     
-                    // Generar PDF automáticamente después de un breve delay
                     setTimeout(() => {
                         downloadPDFAlternative();
-                        // Cerrar la ventana después de generar el PDF
-                        setTimeout(() => {
-                            if (window.self === window.top) {
-                                window.close();
-                            }
-                        }, 2000); // 2 segundos después de generar el PDF
                     }, 1000);
-                    
-                    return; // No continuar con la inicialización normal
+                    return;
                 } catch (error) {
                     console.error('Error cargando datos de cotización:', error);
-                    // Limpiar datos corruptos
-                    localStorage.removeItem('cotizacionParaPDF');
-                    localStorage.removeItem('generarPDFAutomaticamente');
                 }
             }
             
@@ -803,17 +809,17 @@
             console.log('Cargando datos de cotización:', cotizacionData);
             
             // Cargar datos del cliente
-            document.getElementById('cliente').value = cotizacionData.cliente || '';
-            document.getElementById('direccion').value = cotizacionData.direccion || '';
-            document.getElementById('telefono').value = cotizacionData.telefono || '';
-            document.getElementById('fecha').value = cotizacionData.fecha || '';
-            document.getElementById('cheque').value = cotizacionData.cheque || '';
-            document.getElementById('nit').value = cotizacionData.nit || '';
-            document.getElementById('pago').value = cotizacionData.pago || '';
-            document.getElementById('firmaEmpresa').value = cotizacionData.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez';
-            document.getElementById('calcularIva').checked = cotizacionData.calcularIva !== undefined ? cotizacionData.calcularIva : true;
-            document.getElementById('comentarios').value = cotizacionData.comentarios || '';
-            document.getElementById('folio').value = cotizacionData.folio || '';
+            if (document.getElementById('cliente')) document.getElementById('cliente').value = cotizacionData.cliente || '';
+            if (document.getElementById('direccion')) document.getElementById('direccion').value = cotizacionData.direccion || '';
+            if (document.getElementById('telefono')) document.getElementById('telefono').value = cotizacionData.telefono || '';
+            if (document.getElementById('fecha')) document.getElementById('fecha').value = cotizacionData.fecha || '';
+            if (document.getElementById('cheque')) document.getElementById('cheque').value = cotizacionData.cheque || '';
+            if (document.getElementById('nit')) document.getElementById('nit').value = cotizacionData.nit || '';
+            if (document.getElementById('pago')) document.getElementById('pago').value = cotizacionData.pago || '';
+            if (document.getElementById('firmaEmpresa')) document.getElementById('firmaEmpresa').value = cotizacionData.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez';
+            if (document.getElementById('calcularIva')) document.getElementById('calcularIva').checked = cotizacionData.calcularIva !== undefined ? cotizacionData.calcularIva : true;
+            if (document.getElementById('comentarios')) document.getElementById('comentarios').value = cotizacionData.comentarios || '';
+            if (document.getElementById('folio')) document.getElementById('folio').value = cotizacionData.folio || '';
             
             console.log('Fecha cargada:', cotizacionData.fecha);
             console.log('Campo fecha en el formulario:', document.getElementById('fecha').value);

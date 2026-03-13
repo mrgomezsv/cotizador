@@ -116,10 +116,9 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
         folio: cotizacion.folio || ''
       };
 
-      // Store data for the iframe to consume
-      localStorage.setItem('cotizacionParaPDF', JSON.stringify(cotizacionData));
-      localStorage.setItem('generarPDFAutomaticamente', 'true');
-
+      // Pass data via URL hash to avoid iframe storage restrictions
+      const encodedData = encodeURIComponent(JSON.stringify(cotizacionData));
+      
       // Create hidden iframe
       const iframeId = 'pdf-gen-iframe';
       let iframe = document.getElementById(iframeId) as HTMLIFrameElement;
@@ -131,15 +130,13 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
         document.body.appendChild(iframe);
       }
 
-      // Reload iframe with the standalone asset
-      iframe.src = '/assets/cotizaciones-standalone.html';
+      // Load iframe with data in hash
+      iframe.src = `/assets/cotizaciones-standalone.html#data=${encodedData}`;
       
-      // Reset state after some time
+      // Reset state after more safe time
       setTimeout(() => {
         setDownloadingId(null);
-        // Clear storage after generation
-        localStorage.removeItem('generarPDFAutomaticamente');
-      }, 3000);
+      }, 5000);
 
     } catch (error) {
       console.error('Error al preparar la descarga del PDF:', error);
