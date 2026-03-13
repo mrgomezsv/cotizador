@@ -65,5 +65,5 @@ cotizacionSchema.methods.toJSON = function() {
   return obj;
 };
 
-module.exports = mongoose.model('Cotizacion', cotizacionSchema);
+module.exports = mongoose.model('Cotizacion', cotizacionSchema, 'cotizacions');
 
