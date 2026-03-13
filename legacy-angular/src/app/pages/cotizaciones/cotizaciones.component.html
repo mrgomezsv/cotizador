@@ -1,0 +1,714 @@
+<div class="cotizaciones-container">
+  <div class="cotizaciones-header">
+    <h2>🧾 Cotizaciones</h2>
+    <div class="cotizaciones-stats">
+      <span class="total-cotizaciones">{{ filteredCotizaciones.length }} cotizaciones</span>
+      <button class="open-generator-btn" (click)="openGenerator()">
+        🚀 Generar Nueva Cotización
+      </button>
+    </div>
+  </div>
+
+  <!-- Barra de búsqueda -->
+  <div class="search-container">
+    <div class="search-box">
+      <i class="fas fa-search search-icon"></i>
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm" 
+        (input)="filterCotizaciones()"
+        placeholder="Buscar en cotizaciones (ID, cliente, dirección, productos, etc.)"
+        class="search-input"
+      >
+      <button 
+        *ngIf="searchTerm" 
+        (click)="clearSearch()" 
+        class="clear-search-btn"
+        title="Limpiar búsqueda"
+      >
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="cotizaciones-content">
+    <!-- Lista de cotizaciones -->
+    <div class="cotizaciones-list" [class.with-detail]="selectedCotizacion">
+      <div class="cotizaciones-list-header">
+        <h3>Cotizaciones Guardadas</h3>
+        <button class="refresh-btn" (click)="loadCotizaciones()" [disabled]="loading">
+          <i class="fas fa-sync-alt" [class.spinning]="loading"></i>
+        </button>
+      </div>
+
+      <div class="cotizaciones-wrapper">
+        <div class="loading-spinner" *ngIf="loading">
+          <i class="fas fa-spinner fa-spin"></i>
+          <span>Cargando cotizaciones...</span>
+        </div>
+
+        <div class="cotizaciones-empty" *ngIf="!loading && !error && filteredCotizaciones.length === 0">
+          <i class="fas fa-file-invoice"></i>
+          <p *ngIf="searchTerm">No se encontraron cotizaciones que coincidan con "{{ searchTerm }}"</p>
+          <p *ngIf="!searchTerm">No hay cotizaciones guardadas</p>
+          <p class="hint" *ngIf="!searchTerm">Las cotizaciones aparecerán aquí después de guardarlas desde el generador.</p>
+        </div>
+
+        <div class="error-message" *ngIf="error">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>{{ error }}</p>
+        </div>
+
+        <div class="cotizacion-item" 
+             *ngFor="let cotizacion of filteredCotizaciones"
+             [class.selected]="selectedCotizacion?.id === cotizacion.id"
+             (click)="selectCotizacion(cotizacion)"
+             (keyup.enter)="selectCotizacion(cotizacion)"
+             (keyup.space)="selectCotizacion(cotizacion)"
+             tabindex="0"
+             role="button"
+             [attr.aria-label]="'Seleccionar cotización de ' + cotizacion.cliente">
+          <div class="cotizacion-info">
+            <div class="cotizacion-header">
+              <h4 class="cotizacion-cliente">{{ cotizacion.cliente }}</h4>
+              <span class="cotizacion-date">{{ formatDateForList(cotizacion.fecha) }}</span>
+            </div>
+            <div class="cotizacion-details">
+              <p class="cotizacion-total">{{ formatCurrency(cotizacion.total) }}</p>
+              <p class="cotizacion-user" *ngIf="cotizacion.user">
+                Creado por: {{ cotizacion.user.firstName }} {{ cotizacion.user.lastName }}
+              </p>
+            </div>
+            <div class="cotizacion-actions">
+              <!-- Texto fluorescente del estado -->
+              <span class="status-text-fluorescent" 
+                    *ngIf="cotizacion.status"
+                    [style.color]="getStatusColor(cotizacion.status)"
+                    [style.text-shadow]="'0 0 10px ' + getStatusColor(cotizacion.status)">
+                {{ getStatusInfo(cotizacion.status).label }}
+              </span>
+              
+              <button 
+                *ngIf="canDeleteCotizacion()"
+                class="delete-btn" 
+                (click)="deleteCotizacion(cotizacion.id!); $event.stopPropagation()" 
+                title="Eliminar"
+              >
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detalle de la cotización -->
+    <div class="cotizacion-detail" *ngIf="selectedCotizacion">
+      <div class="detail-header">
+        <h3>Detalle de la Cotización</h3>
+        <div class="detail-actions">
+          <button class="edit-btn" (click)="openEditModal(selectedCotizacion)" title="Editar cotización">
+            ✏️ Editar
+          </button>
+          <button class="download-pdf-btn" (click)="downloadPDF()" title="Descargar PDF">
+            📄 Descargar PDF
+          </button>
+          <button class="close-btn" (click)="closeCotizacionDetail()">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="detail-content">
+        <div class="detail-section">
+          <h4>Información del Cliente</h4>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <strong>ID:</strong>
+              <span>{{ selectedCotizacion.id }}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Cliente:</strong>
+              <span>{{ selectedCotizacion.cliente }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedCotizacion.direccion">
+              <strong>Dirección:</strong>
+              <span>{{ selectedCotizacion.direccion }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedCotizacion.telefono">
+              <strong>Teléfono:</strong>
+              <span>{{ selectedCotizacion.telefono }}</span>
+            </div>
+            <div class="detail-item">
+              <strong>Fecha:</strong>
+              <span>{{ formatDate(selectedCotizacion.fecha) }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedCotizacion.user">
+              <strong>Creado por:</strong>
+              <span>{{ selectedCotizacion.user.firstName }} {{ selectedCotizacion.user.lastName }}</span>
+            </div>
+            <div class="detail-item" *ngIf="selectedCotizacion.status">
+              <strong>Estado:</strong>
+              <span class="status-badge" 
+                    [style.background-color]="getStatusBgColor(selectedCotizacion.status)"
+                    [style.color]="getStatusColor(selectedCotizacion.status)">
+                {{ getStatusInfo(selectedCotizacion.status).label }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Productos/Servicios</h4>
+          <div class="items-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Descripción</th>
+                  <th>Cantidad</th>
+                  <th>Precio Unit.</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of selectedCotizacion.items">
+                  <td>{{ item.desc }}</td>
+                  <td>{{ item.qty }}</td>
+                  <td>{{ formatCurrency(item.unit) }}</td>
+                  <td>{{ formatCurrency(item.total) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="detail-section">
+          <h4>Totales</h4>
+          <div class="totals-info">
+            <div class="total-item">
+              <strong>Subtotal:</strong>
+              <span>{{ formatCurrency(selectedCotizacion.subTotal) }}</span>
+            </div>
+            <div class="total-item">
+              <strong>IVA (13%):</strong>
+              <span>{{ formatCurrency(selectedCotizacion.iva) }}</span>
+            </div>
+            <div class="total-item total-final">
+              <strong>Total:</strong>
+              <span>{{ formatCurrency(selectedCotizacion.total) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedCotizacion.cheque || selectedCotizacion.nit || selectedCotizacion.pago">
+          <h4>Información de Pago</h4>
+          <div class="payment-info">
+            <div class="payment-item" *ngIf="selectedCotizacion.cheque">
+              <strong>Cheque a nombre de:</strong>
+              <span>{{ selectedCotizacion.cheque }}</span>
+            </div>
+            <div class="payment-item" *ngIf="selectedCotizacion.nit">
+              <strong>NIT:</strong>
+              <span>{{ selectedCotizacion.nit }}</span>
+            </div>
+            <div class="payment-item" *ngIf="selectedCotizacion.pago">
+              <strong>Forma de Pago:</strong>
+              <span>{{ selectedCotizacion.pago }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-section" *ngIf="selectedCotizacion.comentarios">
+          <h4>Comentarios</h4>
+          <div class="comentarios-content">
+            <p>{{ selectedCotizacion.comentarios }}</p>
+          </div>
+        </div>
+
+        <!-- Sección para cambiar estado -->
+        <div class="detail-section" *ngIf="selectedCotizacion.status">
+          <h4>Gestión de Estado</h4>
+          <div class="status-management">
+            <p class="status-description">
+              Estado actual: <strong>{{ getStatusInfo(selectedCotizacion.status).label }}</strong>
+            </p>
+            
+            <!-- Indicador de Estado Visual -->
+            <div class="status-indicator" *ngIf="selectedCotizacion.status">
+              <div class="status-flow">
+                <div class="status-step" 
+                     [class.active]="selectedCotizacion.status === 'GENERADA'"
+                     [style.background-color]="selectedCotizacion.status === 'GENERADA' ? getStatusColor('GENERADA') : '#e5e7eb'"
+                     [style.color]="selectedCotizacion.status === 'GENERADA' ? 'white' : '#6b7280'"
+                     (click)="changeStatus(selectedCotizacion, 'GENERADA')"
+                     (keyup.enter)="changeStatus(selectedCotizacion, 'GENERADA')"
+                     (keyup.space)="changeStatus(selectedCotizacion, 'GENERADA')"
+                     tabindex="0"
+                     role="button"
+                     [title]="'Cambiar a: Generada'"
+                     [attr.aria-label]="'Cambiar estado a Generada'">
+                  GENERADA
+                </div>
+                <div class="status-step" 
+                     [class.active]="selectedCotizacion.status === 'EN_REVISION'"
+                     [style.background-color]="selectedCotizacion.status === 'EN_REVISION' ? getStatusColor('EN_REVISION') : '#e5e7eb'"
+                     [style.color]="selectedCotizacion.status === 'EN_REVISION' ? 'white' : '#6b7280'"
+                     (click)="changeStatus(selectedCotizacion, 'EN_REVISION')"
+                     (keyup.enter)="changeStatus(selectedCotizacion, 'EN_REVISION')"
+                     (keyup.space)="changeStatus(selectedCotizacion, 'EN_REVISION')"
+                     tabindex="0"
+                     role="button"
+                     [title]="'Cambiar a: En Revisión'"
+                     [attr.aria-label]="'Cambiar estado a En Revisión'">
+                  EN REVISIÓN
+                </div>
+                <div class="status-step" 
+                     [class.active]="selectedCotizacion.status === 'ACEPTADA'"
+                     [style.background-color]="selectedCotizacion.status === 'ACEPTADA' ? getStatusColor('ACEPTADA') : '#e5e7eb'"
+                     [style.color]="selectedCotizacion.status === 'ACEPTADA' ? 'white' : '#6b7280'"
+                     (click)="changeStatus(selectedCotizacion, 'ACEPTADA')"
+                     (keyup.enter)="changeStatus(selectedCotizacion, 'ACEPTADA')"
+                     (keyup.space)="changeStatus(selectedCotizacion, 'ACEPTADA')"
+                     tabindex="0"
+                     role="button"
+                     [title]="'Cambiar a: Aceptada'"
+                     [attr.aria-label]="'Cambiar estado a Aceptada'">
+                  ACEPTADA
+                </div>
+                <div class="status-step" 
+                     [class.active]="selectedCotizacion.status === 'RECHAZADA'"
+                     [style.background-color]="selectedCotizacion.status === 'RECHAZADA' ? getStatusColor('RECHAZADA') : '#e5e7eb'"
+                     [style.color]="selectedCotizacion.status === 'RECHAZADA' ? 'white' : '#6b7280'"
+                     (click)="changeStatus(selectedCotizacion, 'RECHAZADA')"
+                     (keyup.enter)="changeStatus(selectedCotizacion, 'RECHAZADA')"
+                     (keyup.space)="changeStatus(selectedCotizacion, 'RECHAZADA')"
+                     tabindex="0"
+                     role="button"
+                     [title]="'Cambiar a: Rechazada'"
+                     [attr.aria-label]="'Cambiar estado a Rechazada'">
+                  RECHAZADA
+                </div>
+              </div>
+            </div>
+            
+            <div class="status-buttons" style="display: none;">
+              <button 
+                *ngFor="let status of availableStatuses"
+                [disabled]="selectedCotizacion.status === status.value || changingStatus"
+                class="status-change-btn"
+                [style.background-color]="getStatusBgColor(status.value)"
+                [style.color]="getStatusColor(status.value)"
+                [style.border-color]="getStatusColor(status.value)"
+                (click)="changeStatus(selectedCotizacion, status.value)"
+                [title]="'Cambiar a: ' + status.label">
+                {{ status.label }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Registro de Cliente -->
+<div class="modal-overlay" *ngIf="showClientModal" (click)="closeClientModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>Registrar Cliente</h3>
+      <button class="modal-close" 
+              (click)="closeClientModal()"
+              (keyup.enter)="closeClientModal()"
+              (keyup.space)="closeClientModal()"
+              tabindex="0"
+              aria-label="Cerrar modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form (ngSubmit)="createClient()">
+
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="name">Nombre *</label>
+          <input 
+            type="text" 
+            id="name"
+            [(ngModel)]="clientForm.name" 
+            name="name"
+            class="form-control"
+            [class.error]="clientFormErrors['name']"
+            placeholder="Nombre del cliente"
+            required>
+          <div class="error-message" *ngIf="clientFormErrors['name']">
+            {{ clientFormErrors['name'] }}
+          </div>
+        </div>
+
+        <!-- Empresa -->
+        <div class="form-group">
+          <label for="company_name">Empresa</label>
+          <input 
+            type="text" 
+            id="company_name"
+            [(ngModel)]="clientForm.company_name" 
+            name="company_name"
+            class="form-control"
+            placeholder="Nombre de la empresa (opcional)">
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input 
+            type="email" 
+            id="email"
+            [(ngModel)]="clientForm.email" 
+            name="email"
+            class="form-control"
+            [class.error]="clientFormErrors['email']"
+            placeholder="email@ejemplo.com"
+            required>
+          <div class="error-message" *ngIf="clientFormErrors['email']">
+            {{ clientFormErrors['email'] }}
+          </div>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input 
+            type="tel" 
+            id="phone"
+            [(ngModel)]="clientForm.phone" 
+            name="phone"
+            class="form-control"
+            placeholder="71234567">
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label for="address">Dirección</label>
+          <textarea 
+            id="address"
+            [(ngModel)]="clientForm.address" 
+            name="address"
+            class="form-control"
+            rows="3"
+            placeholder="Dirección completa"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" 
+                  class="btn-secondary" 
+                  (click)="closeClientModal()"
+                  (keyup.enter)="closeClientModal()"
+                  (keyup.space)="closeClientModal()"
+                  tabindex="0">
+            Cancelar
+          </button>
+          <button type="submit" 
+                  class="btn-primary" 
+                  [disabled]="creatingClient"
+                  tabindex="0">
+            <i class="fas fa-spinner fa-spin" *ngIf="creatingClient"></i>
+            {{ creatingClient ? 'Registrando...' : 'Registrar Cliente' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edición de Cotización -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-content edit-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>✏️ Editar Cotización</h3>
+      <button class="modal-close" 
+              (click)="closeEditModal()"
+              (keyup.enter)="closeEditModal()"
+              (keyup.space)="closeEditModal()"
+              tabindex="0"
+              aria-label="Cerrar modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form (ngSubmit)="saveCotizacion()">
+        <!-- Información del Cliente -->
+        <div class="form-section">
+          <h4>Información del Cliente</h4>
+          
+          <div class="form-group">
+            <label for="edit-cliente">Cliente *</label>
+            <input 
+              type="text" 
+              id="edit-cliente"
+              [(ngModel)]="editForm.cliente" 
+              name="edit-cliente"
+              class="form-control"
+              [class.error]="editFormErrors['cliente']"
+              placeholder="Nombre del cliente"
+              required>
+            <div class="error-message" *ngIf="editFormErrors['cliente']">
+              {{ editFormErrors['cliente'] }}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-direccion">Dirección</label>
+              <input 
+                type="text" 
+                id="edit-direccion"
+                [(ngModel)]="editForm.direccion" 
+                name="edit-direccion"
+                class="form-control"
+                placeholder="Dirección del cliente">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-telefono">Teléfono</label>
+              <input 
+                type="tel" 
+                id="edit-telefono"
+                [(ngModel)]="editForm.telefono" 
+                name="edit-telefono"
+                class="form-control"
+                placeholder="Teléfono">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-fecha">Fecha *</label>
+              <input 
+                type="date" 
+                id="edit-fecha"
+                [(ngModel)]="editForm.fecha" 
+                name="edit-fecha"
+                class="form-control"
+                [class.error]="editFormErrors['fecha']"
+                required>
+              <div class="error-message" *ngIf="editFormErrors['fecha']">
+                {{ editFormErrors['fecha'] }}
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="edit-firmaEmpresa">Firma Empresa *</label>
+              <input 
+                type="text" 
+                id="edit-firmaEmpresa"
+                [(ngModel)]="editForm.firmaEmpresa" 
+                name="edit-firmaEmpresa"
+                class="form-control"
+                [class.error]="editFormErrors['firmaEmpresa']"
+                placeholder="Nombre de quien firma"
+                required>
+              <div class="error-message" *ngIf="editFormErrors['firmaEmpresa']">
+                {{ editFormErrors['firmaEmpresa'] }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Información de Pago -->
+        <div class="form-section">
+          <h4>Información de Pago</h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="edit-cheque">Cheque a nombre de</label>
+              <input 
+                type="text" 
+                id="edit-cheque"
+                [(ngModel)]="editForm.cheque" 
+                name="edit-cheque"
+                class="form-control"
+                placeholder="Nombre para el cheque">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-nit">NIT</label>
+              <input 
+                type="text" 
+                id="edit-nit"
+                [(ngModel)]="editForm.nit" 
+                name="edit-nit"
+                class="form-control"
+                placeholder="NIT">
+            </div>
+
+            <div class="form-group">
+              <label for="edit-pago">Forma de Pago</label>
+              <input 
+                type="text" 
+                id="edit-pago"
+                [(ngModel)]="editForm.pago" 
+                name="edit-pago"
+                class="form-control"
+                placeholder="Forma de pago">
+            </div>
+          </div>
+        </div>
+
+        <!-- Comentarios -->
+        <div class="form-section">
+          <h4>Comentarios</h4>
+          
+          <div class="form-group">
+            <label for="edit-comentarios">Comentarios sobre la cotización</label>
+            <textarea 
+              id="edit-comentarios"
+              [(ngModel)]="editForm.comentarios" 
+              name="edit-comentarios"
+              class="form-control"
+              rows="4"
+              placeholder="Describe brevemente lo que incluye la cotización, servicios adicionales, condiciones especiales, etc."></textarea>
+            <div class="form-text">
+              Los comentarios aparecerán en el detalle de la cotización y en el PDF generado.
+            </div>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <div class="form-section">
+          <div class="section-header">
+            <h4>Productos/Servicios</h4>
+            <button type="button" class="btn-add-item" (click)="addItem()">
+              <i class="fas fa-plus"></i> Agregar Item
+            </button>
+          </div>
+
+          <div class="error-message" *ngIf="editFormErrors['items']">
+            {{ editFormErrors['items'] }}
+          </div>
+
+          <div class="items-edit-list" *ngIf="editForm.items">
+            <div class="item-edit-row" *ngFor="let item of editForm.items; let i = index">
+              <div class="item-desc">
+                <input 
+                  type="text" 
+                  [(ngModel)]="item.desc" 
+                  [name]="'item-desc-' + i"
+                  class="form-control"
+                  placeholder="Descripción"
+                  (input)="calculateTotals()">
+              </div>
+              <div class="item-qty">
+                <input 
+                  type="number" 
+                  [(ngModel)]="item.qty" 
+                  [name]="'item-qty-' + i"
+                  class="form-control"
+                  min="1"
+                  step="1"
+                  (input)="calculateTotals()">
+              </div>
+              <div class="item-unit">
+                <input 
+                  type="number" 
+                  [(ngModel)]="item.unit" 
+                  [name]="'item-unit-' + i"
+                  class="form-control"
+                  min="0"
+                  step="0.01"
+                  (input)="calculateTotals()">
+              </div>
+              <div class="item-total">
+                <span>{{ formatCurrency(item.total) }}</span>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="btn-remove-item" (click)="removeItem(i)" title="Eliminar item">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totales -->
+        <div class="form-section">
+          <h4>Totales</h4>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>
+                <input 
+                  type="checkbox" 
+                  [(ngModel)]="editForm.calcularIva" 
+                  name="edit-calcularIva"
+                  (change)="calculateTotals()">
+                Calcular IVA (13%)
+              </label>
+            </div>
+          </div>
+
+          <div class="totals-display">
+            <div class="total-row">
+              <strong>Subtotal:</strong>
+              <span>{{ formatCurrency(editForm.subTotal || 0) }}</span>
+            </div>
+            <div class="total-row">
+              <strong>IVA:</strong>
+              <span>{{ formatCurrency(editForm.iva || 0) }}</span>
+            </div>
+            <div class="total-row total-final">
+              <strong>Total:</strong>
+              <span>{{ formatCurrency(editForm.total || 0) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" 
+                  class="btn-secondary" 
+                  (click)="closeEditModal()"
+                  [disabled]="savingCotizacion">
+            Cancelar
+          </button>
+          <button type="submit" 
+                  class="btn-primary" 
+                  [disabled]="savingCotizacion">
+            <i class="fas fa-spinner fa-spin" *ngIf="savingCotizacion"></i>
+            {{ savingCotizacion ? 'Guardando...' : 'Guardar Cambios' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Éxito -->
+<div class="modal-overlay" *ngIf="showSuccessModal" (click)="closeSuccessModal()">
+  <div class="modal-content success-modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>¡Cliente Registrado Exitosamente!</h3>
+    </div>
+
+    <div class="modal-body">
+      <div class="success-content">
+        <div class="success-icon">
+          <i class="fas fa-check-circle"></i>
+        </div>
+        <h4>Registro Completado</h4>
+        <p>Los datos del cliente han sido guardados correctamente en el sistema.</p>
+        <p>Ahora puedes gestionar y administrar este cliente desde la sección de Clientes.</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-primary" 
+                (click)="closeSuccessModal()"
+                (keyup.enter)="closeSuccessModal()"
+                (keyup.space)="closeSuccessModal()"
+                tabindex="0">
+          Ir a Clientes
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
