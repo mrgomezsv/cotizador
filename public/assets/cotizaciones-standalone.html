@@ -662,6 +662,9 @@
                 <label>📍 Dirección: 
                     <input type="text" id="direccion" placeholder="Dirección del cliente">
                 </label>
+                <label>📞 Teléfono: 
+                    <input type="text" id="telefono" placeholder="Teléfono del cliente">
+                </label>
                 <label>📅 Fecha: 
                     <input type="date" id="fecha">
                 </label>
@@ -752,11 +755,17 @@
                     const cotizacionData = JSON.parse(decodeURIComponent(encodedData));
                     cargarCotizacionDesdeDatos(cotizacionData);
                     
-                    // Generar PDF automáticamente
+                    // Generar PDF con mayor espera para asegurar renderizado de imágenes
                     setTimeout(() => {
-                        downloadPDFAlternative();
-                        // No cerramos si está en un iframe (el parent lo manejará o se quedará ahí)
-                    }, 1000);
+                        window.scrollTo(0, 0);
+                        // Asegurarnos de que el watermark esté cargado antes de generar
+                        const watermarkImg = document.querySelector('.watermark img');
+                        if (watermarkImg && !watermarkImg.complete) {
+                            watermarkImg.onload = () => downloadPDFAlternative();
+                        } else {
+                            downloadPDFAlternative();
+                        }
+                    }, 1500);
                     return;
                 } catch (e) {
                     console.error('Error parseando datos del hash:', e);
@@ -1147,13 +1156,21 @@
                         <tbody>
                             ${validItems.map(item => `
                                 <tr>
-                                    <td>${item.desc.replace(/\n/g, "<br>")}</td>
-                                    <td class="text-center">${item.qty}</td>
-                                    <td class="text-right">${formatCurrency(item.unit)}</td>
-                                    <td class="text-right total-cell">${formatCurrency(item.total)}</td>
+                                    <td>${(item.desc || '').replace(/\n/g, "<br>")}</td>
+                                    <td class="text-center">${item.qty || 0}</td>
+                                    <td class="text-right">${formatCurrency(item.unit || 0)}</td>
+                                    <td class="text-right total-cell">${formatCurrency(item.total || 0)}</td>
                                 </tr>
                             `).join("")}
-                            ${validItems.length === 0 ? '<tr><td colspan="4" class="text-center">No hay productos agregados</td></tr>' : ''}
+                            ${validItems.length === 0 && items.length > 0 ? items.map(item => `
+                               <tr>
+                                    <td>${(item.desc || 'Sin descripción').replace(/\n/g, "<br>")}</td>
+                                    <td class="text-center">${item.qty || 0}</td>
+                                    <td class="text-right">${formatCurrency(item.unit || 0)}</td>
+                                    <td class="text-right total-cell">${formatCurrency(item.total || 0)}</td>
+                                </tr>
+                            `).join("") : ''}
+                            ${items.length === 0 ? '<tr><td colspan="4" class="text-center">No hay productos agregados</td></tr>' : ''}
                         </tbody>
                     </table>
                 </div>
@@ -1257,10 +1274,18 @@
                 margin: 0,
                 filename: 'cotizacion-mr.pdf',
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 1.5, useCORS: true, scrollY: 0 },
+                html2canvas: { 
+                    scale: 2, 
+                    useCORS: true, 
+                    scrollY: 0,
+                    logging: false,
+                    letterRendering: true
+                },
                 jsPDF: { unit: 'pt', format: 'a4', orientation: 'portrait' }
             };
-            html2pdf().set(opt).from(preview).save();
+            
+            // Usar Promise de html2pdf para asegurar flujo
+            html2pdf().set(opt).from(preview).toPdf().get('pdf').save();
         }
 
         // Descargar cotización

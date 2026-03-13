@@ -126,7 +126,12 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
       if (!iframe) {
         iframe = document.createElement('iframe');
         iframe.id = iframeId;
-        iframe.style.display = 'none';
+        iframe.style.position = 'absolute';
+        iframe.style.width = '1200px'; // Give it some size
+        iframe.style.height = '1600px';
+        iframe.style.left = '-10000px';
+        iframe.style.top = '-10000px';
+        iframe.style.visibility = 'hidden';
         document.body.appendChild(iframe);
       }
 
@@ -255,16 +260,16 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                       <div className="flex items-center justify-end gap-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => handleDownloadPDF(cotizacion)}
-                          disabled={downloadingId === cotizacion._id}
+                          disabled={downloadingId === (cotizacion._id as unknown as string)}
                           className={cn(
                             "p-2 rounded-lg transition-all",
-                            downloadingId === cotizacion._id 
+                            downloadingId === (cotizacion._id as unknown as string) 
                               ? "text-blue-600 bg-blue-50" 
                               : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
                           )}
                           title="Descargar PDF"
                         >
-                          {downloadingId === cotizacion._id ? (
+                          {downloadingId === (cotizacion._id as unknown as string) ? (
                             <div className="h-4 w-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
                           ) : (
                             <Download className="h-4 w-4" />
