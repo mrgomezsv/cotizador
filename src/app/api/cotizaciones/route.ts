@@ -7,7 +7,6 @@ export async function GET() {
   try {
     await connectDB();
     const cotizaciones = await Cotizacion.find({}).sort({ createdAt: -1 });
-    console.log('DEBUG: First cotizacion from DB:', JSON.stringify(cotizaciones[0], null, 2));
     return NextResponse.json(cotizaciones);
   } catch (error: any) {
     console.error('Error fetching cotizaciones:', error);
