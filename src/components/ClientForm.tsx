@@ -2,6 +2,7 @@
 
 import React, { useState, FormEvent } from "react";
 import { User, Mail, Phone, MapPin, Building, Save } from "lucide-react";
+import { NotificationModal, NotificationType } from "./NotificationModal";
 
 interface ClientFormProps {
   onSuccess: () => void;
@@ -23,6 +24,17 @@ export function ClientForm({ onSuccess, onCancel, initialData }: ClientFormProps
 
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type: NotificationType;
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: "info",
+    title: "",
+    message: "",
+  });
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -52,11 +64,21 @@ export function ClientForm({ onSuccess, onCancel, initialData }: ClientFormProps
         onSuccess();
       } else {
         const error = await response.json();
-        alert("Error: " + error.error);
+        setNotification({
+          isOpen: true,
+          type: "error",
+          title: "Error al guardar",
+          message: error.error || "Hubo un problema al procesar la solicitud.",
+        });
       }
     } catch (error) {
       console.error("Error saving client:", error);
-      alert("Error al guardar el cliente");
+      setNotification({
+        isOpen: true,
+        type: "error",
+        title: "Error de conexión",
+        message: "No se pudo conectar con el servidor. Por favor, intenta de nuevo.",
+      });
     } finally {
       setLoading(false);
     }
@@ -192,6 +214,14 @@ export function ClientForm({ onSuccess, onCancel, initialData }: ClientFormProps
           {initialData ? "Actualizar Cliente" : "Guardar Cliente"}
         </button>
       </div>
+
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={() => setNotification({ ...notification, isOpen: false })}
+      />
     </form>
   );
 }

@@ -13,6 +13,7 @@ import {
   MoreVertical,
   Download
 } from "lucide-react";
+import { NotificationModal, NotificationType } from "./NotificationModal";
 import { cn } from "@/lib/utils";
 import { ICotizacion } from "@/models/Cotizacion";
 import { Modal } from "@/components/Modal";
@@ -39,8 +40,21 @@ interface CotizacionesTableProps {
 export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
   const [cotizaciones, setCotizaciones] = useState<ICotizacion[]>([]);
   const [loading, setLoading] = useState(true);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [selectedCotizacion, setSelectedCotizacion] = useState<ICotizacion | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type: NotificationType;
+    title: string;
+    message: string;
+    confirmAction?: () => void;
+  }>({
+    isOpen: false,
+    type: "info",
+    title: "",
+    message: "",
+  });
 
   async function fetchData() {
     setLoading(true);
@@ -71,6 +85,8 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
 
   const handleDownloadPDF = (cotizacion: ICotizacion) => {
     try {
+      setDownloadingId(cotizacion._id as unknown as string);
+      
       let fechaFormateada = "";
       if (cotizacion.fecha) {
         const fecha = new Date(cotizacion.fecha);
@@ -96,35 +112,73 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
         subTotal: cotizacion.subTotal,
         iva: cotizacion.iva,
         total: cotizacion.total,
-        calcularIva: cotizacion.calcularIva || false
+        calcularIva: cotizacion.calcularIva || false,
+        folio: cotizacion.folio || ''
       };
 
+      // Store data for the iframe to consume
       localStorage.setItem('cotizacionParaPDF', JSON.stringify(cotizacionData));
       localStorage.setItem('generarPDFAutomaticamente', 'true');
 
-      const generatorWindow = window.open('/assets/cotizaciones-standalone.html', '_blank', 'width=1,height=1,left=-1000,top=-1000');
+      // Create hidden iframe
+      const iframeId = 'pdf-gen-iframe';
+      let iframe = document.getElementById(iframeId) as HTMLIFrameElement;
       
+      if (!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = iframeId;
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+      }
+
+      // Reload iframe with the standalone asset
+      iframe.src = '/assets/cotizaciones-standalone.html';
+      
+      // Reset state after some time
       setTimeout(() => {
-        if (generatorWindow && !generatorWindow.closed) {
-          generatorWindow.close();
-        }
+        setDownloadingId(null);
+        // Clear storage after generation
+        localStorage.removeItem('generarPDFAutomaticamente');
       }, 3000);
+
     } catch (error) {
       console.error('Error al preparar la descarga del PDF:', error);
-      alert('Error al generar el PDF');
+      setDownloadingId(null);
+      setNotification({
+        isOpen: true,
+        type: "error",
+        title: "Error al generar PDF",
+        message: "Hubo un problema al crear el archivo PDF. Por favor, intenta de nuevo.",
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("¿Estás seguro de que deseas eliminar esta cotización?")) {
-      try {
-        const response = await fetch(`/api/cotizaciones/${id}`, { method: "DELETE" });
-        if (response.ok) {
-          fetchData();
-        }
-      } catch (error) {
-        console.error("Error deleting:", error);
+    setNotification({
+      isOpen: true,
+      type: "confirm",
+      title: "Eliminar cotización",
+      message: "¿Estás seguro de que deseas eliminar esta cotización? Esta acción no se puede deshacer.",
+      confirmAction: () => confirmDelete(id),
+    });
+  };
+
+  const confirmDelete = async (id: string) => {
+    try {
+      const response = await fetch(`/api/cotizaciones/${id}`, { method: "DELETE" });
+      if (response.ok) {
+        fetchData();
       }
+    } catch (error) {
+      console.error("Error deleting:", error);
+      setNotification({
+        isOpen: true,
+        type: "error",
+        title: "Error al eliminar",
+        message: "No se pudo eliminar la cotización correctamente.",
+      });
+    } finally {
+      setNotification({ ...notification, isOpen: false });
     }
   };
 
@@ -136,6 +190,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/50 border-b border-slate-100">
+                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Folio</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Cliente</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Precio</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider">Fecha</th>
@@ -148,6 +203,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
               {loading ? (
                 Array.from({ length: 5 }).map((_, i) => (
                   <tr key={i} className="animate-pulse">
+                    <td className="px-6 py-5"><div className="h-4 bg-slate-100 rounded w-16"></div></td>
                     <td className="px-6 py-5"><div className="h-4 bg-slate-100 rounded w-32"></div></td>
                     <td className="px-6 py-5"><div className="h-4 bg-slate-100 rounded w-20"></div></td>
                     <td className="px-6 py-5"><div className="h-4 bg-slate-100 rounded w-24"></div></td>
@@ -159,6 +215,11 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
               ) : filteredData.length > 0 ? (
                 filteredData.map((cotizacion: ICotizacion) => (
                   <tr key={cotizacion._id as unknown as string} className="group hover:bg-slate-50/50 transition-colors">
+                    <td className="px-6 py-5">
+                      <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded" title={cotizacion.folio}>
+                        {cotizacion.folio ? `${cotizacion.folio.substring(0, 8)}...` : "S/F"}
+                      </span>
+                    </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-x-3">
                         <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center">
@@ -197,10 +258,20 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                       <div className="flex items-center justify-end gap-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button 
                           onClick={() => handleDownloadPDF(cotizacion)}
-                          className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                          disabled={downloadingId === cotizacion._id}
+                          className={cn(
+                            "p-2 rounded-lg transition-all",
+                            downloadingId === cotizacion._id 
+                              ? "text-blue-600 bg-blue-50" 
+                              : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                          )}
                           title="Descargar PDF"
                         >
-                          <Download className="h-4 w-4" />
+                          {downloadingId === cotizacion._id ? (
+                            <div className="h-4 w-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                          ) : (
+                            <Download className="h-4 w-4" />
+                          )}
                         </button>
                         <button 
                           onClick={() => handleEdit(cotizacion)}
@@ -250,6 +321,15 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
           initialData={selectedCotizacion}
         />
       </Modal>
+
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={() => setNotification({ ...notification, isOpen: false })}
+        onConfirm={notification.confirmAction}
+      />
     </div>
   );
 }

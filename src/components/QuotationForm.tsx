@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Trash2, Calendar, User, FileText, DollarSign, Search, ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ICliente } from "@/models/Cliente";
+import { NotificationModal, NotificationType } from "./NotificationModal";
 
 interface Item {
   desc: string;
@@ -35,11 +36,23 @@ export function QuotationForm({ onSuccess, onCancel, initialData }: QuotationFor
     total: initialData?.total || 0,
     calcularIva: initialData?.calcularIva || false,
     status: initialData?.status || "draft",
+    folio: initialData?.folio || "",
   });
 
   const [loading, setLoading] = useState(false);
   const [clients, setClients] = useState<ICliente[]>([]);
   const [showClientSelector, setShowClientSelector] = useState(false);
+  const [notification, setNotification] = useState<{
+    isOpen: boolean;
+    type: NotificationType;
+    title: string;
+    message: string;
+  }>({
+    isOpen: false,
+    type: "info",
+    title: "",
+    message: "",
+  });
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -125,11 +138,21 @@ export function QuotationForm({ onSuccess, onCancel, initialData }: QuotationFor
         onSuccess();
       } else {
         const error = await response.json();
-        alert("Error: " + error.error);
+        setNotification({
+          isOpen: true,
+          type: "error",
+          title: "Error al guardar",
+          message: error.error || "Hubo un problema al procesar la solicitud.",
+        });
       }
     } catch (error) {
       console.error("Error saving quotation:", error);
-      alert("Error al guardar la cotización");
+      setNotification({
+        isOpen: true,
+        type: "error",
+        title: "Error de conexión",
+        message: "No se pudo conectar con el servidor. Por favor, intenta de nuevo.",
+      });
     } finally {
       setLoading(false);
     }
@@ -137,6 +160,14 @@ export function QuotationForm({ onSuccess, onCancel, initialData }: QuotationFor
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Folio Info (Read-only) */}
+      {formData.folio && (
+        <div className="flex items-center gap-x-2 px-4 py-2 bg-blue-50/50 border border-blue-100 rounded-xl w-fit">
+          <span className="text-[10px] font-bold text-blue-400 uppercase tracking-widest">Folio</span>
+          <span className="text-sm font-mono font-bold text-blue-600">{formData.folio}</span>
+        </div>
+      )}
+
       {/* Client Information */}
       <div className="space-y-4">
         <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider flex items-center gap-x-2">
@@ -357,6 +388,14 @@ export function QuotationForm({ onSuccess, onCancel, initialData }: QuotationFor
           Guardar Cotización
         </button>
       </div>
+
+      <NotificationModal
+        isOpen={notification.isOpen}
+        type={notification.type}
+        title={notification.title}
+        message={notification.message}
+        onClose={() => setNotification({ ...notification, isOpen: false })}
+      />
     </form>
   );
 }

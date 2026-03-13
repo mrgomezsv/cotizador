@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Users, Plus, Search, Filter, Mail, Phone, MapPin, Building, MoreVertical, Trash2, Edit } from "lucide-react";
 import { Modal } from "@/components/Modal";
 import { ClientForm } from "@/components/ClientForm";
+import { NotificationModal } from "@/components/NotificationModal";
 import { cn } from "@/lib/utils";
 
 export default function ClientesPage() {
@@ -12,6 +13,10 @@ export default function ClientesPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ isOpen: boolean; clientId: string | null }>({
+    isOpen: false,
+    clientId: null,
+  });
 
   const fetchClients = async () => {
     setLoading(true);
@@ -37,15 +42,21 @@ export default function ClientesPage() {
   };
 
   const handleDelete = async (id: string) => {
-    if (confirm("¿Estás seguro de que deseas eliminar este cliente?")) {
-      try {
-        const response = await fetch(`/api/clientes/${id}`, { method: "DELETE" });
-        if (response.ok) {
-          fetchClients();
-        }
-      } catch (error) {
-        console.error("Error deleting client:", error);
+    setDeleteConfirm({ isOpen: true, clientId: id });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirm.clientId) return;
+    
+    try {
+      const response = await fetch(`/api/clientes/${deleteConfirm.clientId}`, { method: "DELETE" });
+      if (response.ok) {
+        fetchClients();
       }
+    } catch (error) {
+      console.error("Error deleting client:", error);
+    } finally {
+      setDeleteConfirm({ isOpen: false, clientId: null });
     }
   };
 
@@ -224,6 +235,17 @@ export default function ClientesPage() {
           initialData={selectedClient}
         />
       </Modal>
+
+      <NotificationModal
+        isOpen={deleteConfirm.isOpen}
+        type="confirm"
+        title="Confirmar eliminación"
+        message="¿Estás seguro de que deseas eliminar este cliente? Esta acción no se puede deshacer."
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onClose={() => setDeleteConfirm({ isOpen: false, clientId: null })}
+        onConfirm={confirmDelete}
+      />
     </div>
   );
 }
