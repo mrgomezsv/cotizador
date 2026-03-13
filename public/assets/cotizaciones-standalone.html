@@ -664,10 +664,7 @@
                 </label>
                 <label>📞 Teléfono: 
                     <input type="text" id="telefono" placeholder="Número de teléfono">
-                </label>
-                <label>📅 Fecha: 
-                    <input type="date" id="fecha">
-                </label>
+                <input type="hidden" id="folio">
             </fieldset>
             
             <fieldset>
@@ -765,7 +762,9 @@
                         downloadPDFAlternative();
                         // Cerrar la ventana después de generar el PDF
                         setTimeout(() => {
-                            window.close();
+                            if (window.self === window.top) {
+                                window.close();
+                            }
                         }, 2000); // 2 segundos después de generar el PDF
                     }, 1000);
                     
@@ -814,6 +813,7 @@
             document.getElementById('firmaEmpresa').value = cotizacionData.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez';
             document.getElementById('calcularIva').checked = cotizacionData.calcularIva !== undefined ? cotizacionData.calcularIva : true;
             document.getElementById('comentarios').value = cotizacionData.comentarios || '';
+            document.getElementById('folio').value = cotizacionData.folio || '';
             
             console.log('Fecha cargada:', cotizacionData.fecha);
             console.log('Campo fecha en el formulario:', document.getElementById('fecha').value);
@@ -1091,6 +1091,7 @@
             const pago = document.getElementById('pago').value;
             const firmaEmpresa = document.getElementById('firmaEmpresa').value;
             const comentarios = document.getElementById('comentarios').value;
+            const folio = document.getElementById('folio').value;
             
             // Formatear fecha
             const fechaFormateada = fecha ? 
@@ -1123,6 +1124,7 @@
                             <div><strong>Teléfono:</strong> ${telefono || 'No especificado'}</div>
                         </div>
                         <div class="fecha">
+                            ${folio ? `<div style="font-size: 16px; color: var(--secondary); margin-bottom: 4px;"><strong>${folio}</strong></div>` : ''}
                             <strong>${fechaFormateada}</strong>
                         </div>
                     </div>

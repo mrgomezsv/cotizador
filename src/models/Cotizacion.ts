@@ -22,6 +22,7 @@ export interface ICotizacion extends Document {
   iva: number;
   total: number;
   calcularIva: boolean;
+  folio: string;
   status: 'draft' | 'sent' | 'approved' | 'rejected';
   userId?: string | null;
   companyId?: string | null;
@@ -51,6 +52,7 @@ const cotizacionSchema = new Schema<ICotizacion>({
   iva: { type: Number, required: true, default: 0 },
   total: { type: Number, required: true },
   calcularIva: { type: Boolean, default: false },
+  folio: { type: String, required: true, unique: true },
   status: { 
     type: String, 
     enum: ['draft', 'sent', 'approved', 'rejected'],
@@ -63,6 +65,11 @@ const cotizacionSchema = new Schema<ICotizacion>({
   collection: 'cotizacions' // Ensuring we use the existing collection
 });
 
-const Cotizacion: Model<ICotizacion> = mongoose.models.Cotizacion || mongoose.model<ICotizacion>('Cotizacion', cotizacionSchema);
+// Force delete the model if already defined to refresh schema during development
+if (mongoose.models.Cotizacion) {
+  delete mongoose.models.Cotizacion;
+}
+
+const Cotizacion: Model<ICotizacion> = mongoose.model<ICotizacion>('Cotizacion', cotizacionSchema);
 
 export default Cotizacion;
