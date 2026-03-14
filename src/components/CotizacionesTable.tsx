@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { 
-  Search, 
-  Filter, 
-  Plus, 
+import {
+  Search,
+  Filter,
+  Plus,
   Clock,
   User,
   Activity,
@@ -73,7 +73,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
     fetchData();
   }, []);
 
-  const filteredData = cotizaciones.filter(c => 
+  const filteredData = cotizaciones.filter(c =>
     c.cliente.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.total.toString().includes(searchTerm)
   );
@@ -86,7 +86,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
   const handleDownloadPDF = (cotizacion: ICotizacion) => {
     try {
       setDownloadingId(cotizacion._id as unknown as string);
-      
+
       let fechaFormateada = "";
       if (cotizacion.fecha) {
         const fecha = new Date(cotizacion.fecha);
@@ -106,7 +106,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
         cheque: cotizacion.cheque || '',
         nit: cotizacion.nit || '',
         pago: cotizacion.pago || '',
-        firmaEmpresa: cotizacion.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez',
+        firmaEmpresa: cotizacion.firmaEmpresa || 'Tec. Ing. Mario Roberto Gómez Martínez',
         comentarios: cotizacion.comentarios || '',
         items: cotizacion.items,
         subTotal: cotizacion.subTotal,
@@ -118,11 +118,11 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
 
       // Pass data via URL hash to avoid iframe storage restrictions
       const encodedData = encodeURIComponent(JSON.stringify(cotizacionData));
-      
+
       // Create hidden iframe
       const iframeId = 'pdf-gen-iframe';
       let iframe = document.getElementById(iframeId) as HTMLIFrameElement;
-      
+
       if (!iframe) {
         iframe = document.createElement('iframe');
         iframe.id = iframeId;
@@ -137,7 +137,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
 
       // Load iframe with data in hash
       iframe.src = `/assets/cotizaciones-standalone.html#data=${encodedData}`;
-      
+
       // Reset state after more safe time
       setTimeout(() => {
         setDownloadingId(null);
@@ -258,13 +258,13 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button 
+                        <button
                           onClick={() => handleDownloadPDF(cotizacion)}
                           disabled={downloadingId === (cotizacion._id as unknown as string)}
                           className={cn(
                             "p-2 rounded-lg transition-all",
-                            downloadingId === (cotizacion._id as unknown as string) 
-                              ? "text-blue-600 bg-blue-50" 
+                            downloadingId === (cotizacion._id as unknown as string)
+                              ? "text-blue-600 bg-blue-50"
                               : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
                           )}
                           title="Descargar PDF"
@@ -275,14 +275,14 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                             <Download className="h-4 w-4" />
                           )}
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleEdit(cotizacion)}
                           className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
                           title="Editar"
                         >
                           <FileText className="h-4 w-4" />
                         </button>
-                        <button 
+                        <button
                           onClick={() => handleDelete(cotizacion._id as unknown as string)}
                           className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
                           title="Eliminar"
@@ -308,18 +308,18 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
         </div>
       </div>
 
-      <Modal 
-        isOpen={isEditModalOpen} 
-        onClose={() => setIsEditModalOpen(false)} 
+      <Modal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
         title="Editar Cotización"
         maxWidth="2xl"
       >
-        <QuotationForm 
+        <QuotationForm
           onSuccess={() => {
             setIsEditModalOpen(false);
             fetchData();
-          }} 
-          onCancel={() => setIsEditModalOpen(false)} 
+          }}
+          onCancel={() => setIsEditModalOpen(false)}
           initialData={selectedCotizacion}
         />
       </Modal>

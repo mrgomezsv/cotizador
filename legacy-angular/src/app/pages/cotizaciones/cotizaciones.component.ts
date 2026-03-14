@@ -15,13 +15,13 @@ import { ModalService } from '../../services/modal.service';
   styleUrl: './cotizaciones.component.scss'
 })
 export class CotizacionesComponent implements OnInit {
-  
+
   private platformId = inject(PLATFORM_ID);
   private cotizacionService = inject(CotizacionService);
   private clientService = inject(ClientService);
   private apiService = inject(ApiService);
   private modalService = inject(ModalService);
-  
+
   // Lista de cotizaciones guardadas
   cotizaciones: Cotizacion[] = [];
   filteredCotizaciones: Cotizacion[] = [];
@@ -30,13 +30,13 @@ export class CotizacionesComponent implements OnInit {
   error = '';
   totalCotizaciones = 0;
   searchTerm = '';
-  
+
   // Sistema de estados
   selectedStatusFilter = 'ALL';
   statusHistory: CotizacionStatusHistory[] = [];
   showStatusHistory = false;
   changingStatus = false;
-  
+
   // Estados disponibles
   readonly availableStatuses = [
     { value: 'GENERADA', label: 'Generada', color: '#3b82f6', bgColor: '#dbeafe' }, // Azul
@@ -78,7 +78,7 @@ export class CotizacionesComponent implements OnInit {
   loadCotizaciones() {
     // console.log('🚨 [LOAD] Iniciando carga de cotizaciones...');
     // alert('🚨 CARGANDO COTIZACIONES...');
-    
+
     this.cotizacionService.getAll().subscribe({
       next: (cotizaciones: Cotizacion[]) => {
         // console.log('🚨 [LOAD] Cotizaciones recibidas:', cotizaciones);
@@ -185,7 +185,7 @@ export class CotizacionesComponent implements OnInit {
           this.cotizaciones = this.cotizaciones.filter(c => c.id !== id);
           this.filteredCotizaciones = this.filteredCotizaciones.filter(c => c.id !== id);
           this.totalCotizaciones = this.cotizaciones.length;
-          
+
           // Si la cotización eliminada era la seleccionada, cerrar el detalle
           if (this.selectedCotizacion?.id === id) {
             this.selectedCotizacion = null;
@@ -229,7 +229,7 @@ export class CotizacionesComponent implements OnInit {
         cheque: this.selectedCotizacion.cheque || '',
         nit: this.selectedCotizacion.nit || '',
         pago: this.selectedCotizacion.pago || '',
-        firmaEmpresa: this.selectedCotizacion.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez',
+        firmaEmpresa: this.selectedCotizacion.firmaEmpresa || 'Tec. Ing. Mario Roberto Gómez Martínez',
         comentarios: this.selectedCotizacion.comentarios || '',
         items: this.selectedCotizacion.items,
         subTotal: this.selectedCotizacion.subTotal,
@@ -248,7 +248,7 @@ export class CotizacionesComponent implements OnInit {
       const win = window as unknown as Window;
       if (win && win.open) {
         const generatorWindow = win.open('/assets/cotizaciones-standalone.html', '_blank', 'width=1,height=1,left=-1000,top=-1000');
-        
+
         // Cerrar la ventana después de un breve delay para que se genere el PDF
         setTimeout(() => {
           if (generatorWindow && !generatorWindow.closed) {
@@ -266,53 +266,53 @@ export class CotizacionesComponent implements OnInit {
   formatDate(dateString: string): string {
     try {
       console.log(`[FECHA] Fecha recibida: ${dateString}`);
-      
+
       // Si la fecha es un string con formato MM/DD/YYYY HH:mm:ss (nuevo formato del backend)
       if (typeof dateString === 'string' && /^\d{2}\/\d{2}\/\d{4} \d{2}:\d{2}:\d{2}$/.test(dateString)) {
         // Crear una nueva fecha manteniendo la zona horaria
         const [datePart, timePart] = dateString.split(' ');
         const [month, day, year] = datePart.split('/').map(Number);
         const [hour, minute, second] = timePart.split(':').map(Number);
-        
+
         // Crear fecha usando la zona horaria local
         const date = new Date(year, month - 1, day, hour, minute, second);
-        
+
         // Formatear para mostrar en español
         const options: Intl.DateTimeFormatOptions = {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
         };
-        
+
         // Usar toLocaleDateString
         const result = date.toLocaleDateString('es-ES', options);
         console.log(`[FECHA] Resultado final: ${result}`);
         return result;
       }
-      
+
       // Si la fecha es un string con formato YYYY-MM-DD HH:mm:ss (formato antiguo)
       if (typeof dateString === 'string' && /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(dateString)) {
         // Crear una nueva fecha manteniendo la zona horaria
         const [datePart, timePart] = dateString.split(' ');
         const [year, month, day] = datePart.split('-').map(Number);
         const [hour, minute, second] = timePart.split(':').map(Number);
-        
+
         // Crear fecha usando la zona horaria local
         const date = new Date(year, month - 1, day, hour, minute, second);
-        
+
         // Formatear para mostrar en español
         const options: Intl.DateTimeFormatOptions = {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
         };
-        
+
         // Usar toLocaleDateString
         const result = date.toLocaleDateString('es-ES', options);
         console.log(`[FECHA] Resultado final: ${result}`);
         return result;
       }
-      
+
       // Si es otro formato de fecha, intentar convertirla
       const date = new Date(dateString);
       if (!isNaN(date.getTime())) {
@@ -323,7 +323,7 @@ export class CotizacionesComponent implements OnInit {
         };
         return date.toLocaleDateString('es-ES', options);
       }
-      
+
       // Si no es el formato esperado, devolver la fecha original
       console.error('[FECHA] Formato no reconocido:', dateString);
       return dateString;
@@ -342,7 +342,7 @@ export class CotizacionesComponent implements OnInit {
   // Formatear moneda
   formatCurrency(value: number): string {
     return "$ " + Number(value).toLocaleString("en-US", {
-      minimumFractionDigits: 2, 
+      minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
   }
@@ -354,7 +354,7 @@ export class CotizacionesComponent implements OnInit {
         // Limpiar cualquier dato previo
         localStorage.removeItem('cotizacionParaPDF');
         localStorage.removeItem('generarPDFAutomaticamente');
-        
+
         const win = window as unknown as Window;
         if (win && win.open) {
           win.open('/assets/cotizaciones-standalone.html', '_blank');
@@ -366,7 +366,7 @@ export class CotizacionesComponent implements OnInit {
   }
 
   // Métodos para el sistema de estados
-  
+
   // Obtener información del estado
   getStatusInfo(status: string) {
     return this.availableStatuses.find(s => s.value === status) || this.availableStatuses[0];
@@ -387,10 +387,10 @@ export class CotizacionesComponent implements OnInit {
   // Cambiar estado de una cotización
   changeStatus(cotizacion: Cotizacion, newStatus: string) {
     if (!cotizacion.id) return;
-    
+
     this.changingStatus = true;
     const notes = prompt('Notas sobre el cambio de estado (opcional):');
-    
+
     this.cotizacionService.changeStatus(cotizacion.id, newStatus, notes || undefined).subscribe({
       next: (updatedCotizacion) => {
         // Mapear estado del backend a frontend
@@ -402,20 +402,20 @@ export class CotizacionesComponent implements OnInit {
         if (index !== -1) {
           this.cotizaciones[index] = mappedUpdated as Cotizacion;
         }
-        
+
         const filteredIndex = this.filteredCotizaciones.findIndex(c => c.id === cotizacion.id);
         if (filteredIndex !== -1) {
           this.filteredCotizaciones[filteredIndex] = mappedUpdated as Cotizacion;
         }
-        
+
         // Si es la cotización seleccionada, actualizarla
         if (this.selectedCotizacion?.id === cotizacion.id) {
           this.selectedCotizacion = mappedUpdated as Cotizacion;
         }
-        
+
         this.changingStatus = false;
         this.modalService.success('Estado actualizado', `El estado ha sido cambiado a: ${this.getStatusInfo(newStatus).label}`);
-        
+
         // Si el estado es ACEPTADA, mostrar modal de registro de cliente
         if (newStatus === 'ACEPTADA') {
           this.showClientRegistrationModal(updatedCotizacion);
@@ -459,9 +459,9 @@ export class CotizacionesComponent implements OnInit {
   loadCotizacionesWithFilters() {
     this.loading = true;
     this.error = '';
-    
+
     const status = this.selectedStatusFilter === 'ALL' ? undefined : this.selectedStatusFilter;
-    
+
     this.cotizacionService.getAllWithFilters(status).subscribe({
       next: (response) => {
         const mapped = response.data.map(c => (
@@ -488,10 +488,10 @@ export class CotizacionesComponent implements OnInit {
         const [datePart, timePart] = dateString.split(' ');
         const [month, day, year] = datePart.split('/').map(Number);
         const [hour, minute, second] = timePart.split(':').map(Number);
-        
+
         // Crear fecha usando la zona horaria local
         const date = new Date(year, month - 1, day, hour, minute, second);
-        
+
         return date.toLocaleString('es-ES', {
           year: 'numeric',
           month: 'short',
@@ -500,7 +500,7 @@ export class CotizacionesComponent implements OnInit {
           minute: '2-digit'
         });
       }
-      
+
       // Para otros formatos de fecha, intentar convertir directamente
       const date = new Date(dateString);
       if (!isNaN(date.getTime())) {
@@ -512,7 +512,7 @@ export class CotizacionesComponent implements OnInit {
           minute: '2-digit'
         });
       }
-      
+
       // Si no se puede convertir, devolver la fecha original
       return dateString;
     } catch (error) {
@@ -773,7 +773,7 @@ export class CotizacionesComponent implements OnInit {
     this.cotizacionService.update(this.editingCotizacion.id, updateData).subscribe({
       next: (updatedCotizacion) => {
         console.log('✅ Cotización actualizada exitosamente:', updatedCotizacion);
-        
+
         // Mapear estado del backend a frontend
         const mappedUpdated = updatedCotizacion && updatedCotizacion.status
           ? { ...updatedCotizacion, status: this.mapBackendStatusToFrontend(updatedCotizacion.status) }
@@ -798,7 +798,7 @@ export class CotizacionesComponent implements OnInit {
         this.savingCotizacion = false;
         this.closeEditModal();
         this.modalService.success('Cotización actualizada', 'Los cambios se han guardado exitosamente');
-        
+
         // Recargar la lista para asegurar que todo esté actualizado
         this.loadCotizaciones();
       },
@@ -811,9 +811,9 @@ export class CotizacionesComponent implements OnInit {
           error: error?.error,
           url: error?.url
         });
-        
+
         this.savingCotizacion = false;
-        
+
         let errorMessage = 'No se pudo actualizar la cotización.';
         if (error?.error?.details) {
           errorMessage += ` ${error.error.details}`;
@@ -822,7 +822,7 @@ export class CotizacionesComponent implements OnInit {
         } else if (error?.message) {
           errorMessage += ` ${error.message}`;
         }
-        
+
         this.modalService.error('Error al actualizar', errorMessage);
       }
     });

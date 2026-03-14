@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generador de Cotizaciones - Mi Factura DTE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
         :root {
             /* PALETA BASADA EN LA UI DE MI FACTURA DTE */
-            --brand-primary: #2563EB;   /* Azul vibrante del logo y estados activos */
-            --brand-secondary: #64748B; /* Gris pizarra para textos secundarios (reemplaza al dorado) */
-            --brand-accent: #EFF6FF;    /* Azul súper suave para fondos secundarios */
-            --text-main: #0F172A;       /* Casi negro para lectura óptima */
-            --text-dim: #64748B;        /* Gris para descripciones */
-            --bg-paper: #FFFFFF;        /* Blanco puro de las tarjetas */
-            --border-soft: #E2E8F0;     /* Gris muy sutil para las divisiones */
-            --table-header: #F8FAFC;    /* Fondo de la tabla del dashboard */
+            --brand-primary: #2563EB;
+            /* Azul vibrante del logo y estados activos */
+            --brand-secondary: #64748B;
+            /* Gris pizarra para textos secundarios (reemplaza al dorado) */
+            --brand-accent: #EFF6FF;
+            /* Azul súper suave para fondos secundarios */
+            --text-main: #0F172A;
+            /* Casi negro para lectura óptima */
+            --text-dim: #64748B;
+            /* Gris para descripciones */
+            --bg-paper: #FFFFFF;
+            /* Blanco puro de las tarjetas */
+            --border-soft: #E2E8F0;
+            /* Gris muy sutil para las divisiones */
+            --table-header: #F8FAFC;
+            /* Fondo de la tabla del dashboard */
             --table-row-even: #F8FAFC;
         }
 
@@ -41,7 +51,7 @@
             background: var(--bg-paper);
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             border: 1px solid var(--border-soft);
         }
 
@@ -82,7 +92,7 @@
             font-size: 13px;
         }
 
-        .cotizacion-form input[type="text"], 
+        .cotizacion-form input[type="text"],
         .cotizacion-form input[type="date"],
         .cotizacion-form input[type="number"],
         .cotizacion-form textarea {
@@ -98,7 +108,7 @@
             transition: all 0.2s ease;
         }
 
-        .cotizacion-form input:focus, 
+        .cotizacion-form input:focus,
         .cotizacion-form textarea:focus {
             outline: none;
             border-color: var(--brand-primary);
@@ -154,28 +164,42 @@
             gap: 8px;
         }
 
-        .add-item { background: var(--brand-accent); color: var(--brand-primary); }
-        .clear-form { background: #F1F5F9; color: var(--text-dim); }
-        .download-cotizacion { background: var(--brand-primary); color: white; margin-left: auto; }
+        .add-item {
+            background: var(--brand-accent);
+            color: var(--brand-primary);
+        }
+
+        .clear-form {
+            background: #F1F5F9;
+            color: var(--text-dim);
+        }
+
+        .download-cotizacion {
+            background: var(--brand-primary);
+            color: white;
+            margin-left: auto;
+        }
 
         /* PREVIEW AREA */
         .preview-container {
             margin-top: 40px;
             background: #F8FAFC;
-            padding: 20px 0; 
+            padding: 20px 0;
             border-radius: 24px;
             border: 1px solid var(--border-soft);
-            display: block; 
+            display: block;
             overflow-x: auto;
         }
 
         .pdf-container {
-            width: 794px; /* A4 width */
-            min-height: 1123px; /* A4 height mínimo */
-            height: auto; 
+            width: 794px;
+            /* A4 width */
+            min-height: 1123px;
+            /* A4 height mínimo */
+            height: auto;
             background: white;
             padding: 40px 50px;
-            margin: 0 auto; 
+            margin: 0 auto;
             position: relative;
             box-shadow: none;
             color: var(--text-main);
@@ -183,7 +207,7 @@
             flex-direction: column;
             box-sizing: border-box;
             text-align: left;
-            overflow: hidden; 
+            overflow: hidden;
         }
 
         /* PREMIUM PDF CONTENT STYLES */
@@ -191,14 +215,14 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 8px; 
+            margin-bottom: 8px;
             position: relative;
         }
 
         .pdf-header::after {
             content: '';
             position: absolute;
-            bottom: -5px; 
+            bottom: -5px;
             left: 0;
             width: 100%;
             height: 1px;
@@ -232,7 +256,7 @@
             color: var(--text-dim);
             margin-top: 2px;
             display: flex;
-            gap: 12px; 
+            gap: 12px;
         }
 
         .doc-type {
@@ -252,7 +276,7 @@
             text-align: right;
             display: flex;
             flex-direction: column;
-            align-items: flex-end; 
+            align-items: flex-end;
             gap: 4px;
         }
 
@@ -268,11 +292,11 @@
 
         .client-section {
             background: var(--brand-accent);
-            padding: 12px 16px; 
+            padding: 12px 16px;
             border-radius: 12px;
-            margin-bottom: 12px; 
+            margin-bottom: 12px;
             display: grid;
-            grid-template-columns: 2fr 1fr; 
+            grid-template-columns: 2fr 1fr;
             gap: 15px;
             border: 1px solid var(--border-soft);
         }
@@ -286,7 +310,8 @@
             margin-bottom: 12px;
         }
 
-        .client-info div, .payment-info div {
+        .client-info div,
+        .payment-info div {
             margin-top: 4px;
             font-size: 13px;
             line-height: 1.5;
@@ -295,7 +320,7 @@
         .pdf-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px; 
+            margin-bottom: 15px;
         }
 
         .pdf-table th {
@@ -303,37 +328,48 @@
             background: var(--table-header);
             color: var(--brand-secondary);
             text-align: left;
-            padding: 10px 16px; 
-            font-size: 10px; 
+            padding: 10px 16px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             border-bottom: 2px solid var(--border-soft);
         }
 
-        .pdf-table th:first-child { border-radius: 12px 0 0 0; }
-        .pdf-table th:last-child { border-radius: 0 12px 0 0; text-align: right; }
+        .pdf-table th:first-child {
+            border-radius: 12px 0 0 0;
+        }
+
+        .pdf-table th:last-child {
+            border-radius: 0 12px 0 0;
+            text-align: right;
+        }
 
         .pdf-table td {
-            padding: 10px 16px; 
+            padding: 10px 16px;
             border-bottom: 1px solid var(--border-soft);
             font-size: 13px;
             vertical-align: top;
             line-height: 1.4;
         }
 
-        .pdf-table td:last-child { text-align: right; font-weight: 600; }
+        .pdf-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+        }
 
-        .pdf-table tr:last-child td { border-bottom: none; }
+        .pdf-table tr:last-child td {
+            border-bottom: none;
+        }
 
         .comments-box {
             background: var(--brand-accent);
             border: 1px solid var(--border-soft);
-            padding: 16px 20px; 
+            padding: 16px 20px;
             border-radius: 12px;
             font-size: 13px;
             color: var(--text-main);
-            line-height: 1.5; 
+            line-height: 1.5;
             margin-bottom: 10px;
         }
 
@@ -341,7 +377,7 @@
             display: grid;
             grid-template-columns: 2.2fr 1fr;
             gap: 30px;
-            margin-bottom: 15px; 
+            margin-bottom: 15px;
         }
 
         .totals-box {
@@ -370,9 +406,9 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 30px;
-            margin-top: auto; 
-            padding-top: 40px; 
-            margin-bottom: 15px; 
+            margin-top: auto;
+            padding-top: 40px;
+            margin-bottom: 15px;
         }
 
         .signature-box {
@@ -409,35 +445,55 @@
         }
 
         @media print {
-            body { background: white; padding: 0; }
-            .cotizaciones-container, .actions, h1, h2, .cotizacion-form { display: none; }
-            .preview-container { padding: 0; background: none; border: none; }
-            .pdf-container { box-shadow: none; border: none; }
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .cotizaciones-container,
+            .actions,
+            h1,
+            h2,
+            .cotizacion-form {
+                display: none;
+            }
+
+            .preview-container {
+                padding: 0;
+                background: none;
+                border: none;
+            }
+
+            .pdf-container {
+                box-shadow: none;
+                border: none;
+            }
         }
     </style>
 </head>
+
 <body>
     <div class="cotizaciones-container">
         <h1>🧾 Generador de Cotizaciones</h1>
-        
+
         <form class="cotizacion-form" id="cotizacionForm">
             <fieldset>
                 <legend>📋 Datos Generales del Cliente</legend>
-                <label>👤 Cliente: 
+                <label>👤 Cliente:
                     <input type="text" id="cliente" placeholder="Nombre del cliente">
                 </label>
-                <label>📍 Dirección: 
+                <label>📍 Dirección:
                     <input type="text" id="direccion" placeholder="Dirección del cliente">
                 </label>
-                <label>📞 Teléfono: 
+                <label>📞 Teléfono:
                     <input type="text" id="telefono" placeholder="Teléfono del cliente">
                 </label>
-                <label>📅 Fecha: 
+                <label>📅 Fecha:
                     <input type="date" id="fecha">
                 </label>
                 <input type="hidden" id="folio">
             </fieldset>
-            
+
             <fieldset>
                 <legend>🛒 Productos / Servicios</legend>
                 <table class="items-table" id="itemsTable">
@@ -457,20 +513,21 @@
                     ➕ Agregar Producto/Servicio
                 </button>
             </fieldset>
-            
+
             <fieldset>
                 <legend>💳 Datos Sobre las Condiciones de Pago</legend>
-                <label>📄 Emitir cheque a nombre de: 
+                <label>📄 Emitir cheque a nombre de:
                     <input type="text" id="cheque" placeholder="Nombre completo para el cheque">
                 </label>
-                <label>🆔 NIT: 
+                <label>🆔 NIT:
                     <input type="text" id="nit" placeholder="Número de identificación tributaria">
                 </label>
-                <label>💵 Forma de Pago: 
+                <label>💵 Forma de Pago:
                     <input type="text" id="pago" placeholder="Descripción de la forma de pago">
                 </label>
-                <label>✍️ Firma Empresa: 
-                    <input type="text" id="firmaEmpresa" placeholder="Nombre de la persona que firma" value="Licda. Carmen Concepcion Hernandez">
+                <label>✍️ Firma Empresa:
+                    <input type="text" id="firmaEmpresa" placeholder="Nombre de la persona que firma"
+                        value="Tec. Ing. Mario Roberto Gómez Martínez">
                 </label>
                 <label class="toggle-label">
                     <span>💰 Calcular IVA (13%):</span>
@@ -480,25 +537,28 @@
                     </div>
                 </label>
                 <label>📝 Comentarios sobre la cotización:
-                    <textarea id="comentarios" rows="4" placeholder="Describe brevemente lo que incluye la cotización"></textarea>
+                    <textarea id="comentarios" rows="4"
+                        placeholder="Describe brevemente lo que incluye la cotización"></textarea>
                 </label>
             </fieldset>
         </form>
-        
+
         <div class="actions">
             <button class="clear-form" onclick="clearForm()" type="button">
                 🗑️ Limpiar Formulario
             </button>
-            <button class="download-cotizacion" onclick="downloadCotizacion()" type="button" id="downloadButton" disabled>
+            <button class="download-cotizacion" onclick="downloadCotizacion()" type="button" id="downloadButton"
+                disabled>
                 📄 Descargar Cotización
             </button>
         </div>
-        
-        <div id="validationMessage" style="display: none; margin: 10px 0; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;">
+
+        <div id="validationMessage"
+            style="display: none; margin: 10px 0; padding: 10px; background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; border-radius: 4px;">
             <strong>⚠️ Campos requeridos faltantes:</strong>
             <ul id="validationList" style="margin: 5px 0 0 20px;"></ul>
         </div>
-        
+
         <h2>👁️ Previsualización</h2>
         <div class="preview-container">
             <div id="cotizacion-preview" class="pdf-container">
@@ -510,14 +570,14 @@
     <script>
         let items = [];
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const hash = window.location.hash;
             if (hash.startsWith('#data=')) {
                 try {
                     const encodedData = hash.substring(6);
                     const cotizacionData = JSON.parse(decodeURIComponent(encodedData));
                     cargarCotizacionDesdeDatos(cotizacionData);
-                    
+
                     setTimeout(() => {
                         window.scrollTo(0, 0);
                         const watermarkImg = document.querySelector('.watermark img');
@@ -535,14 +595,14 @@
 
             const cotizacionParaPDF = localStorage.getItem('cotizacionParaPDF');
             const generarPDFAutomaticamente = localStorage.getItem('generarPDFAutomaticamente');
-            
+
             if (cotizacionParaPDF && generarPDFAutomaticamente === 'true') {
                 try {
                     const cotizacionData = JSON.parse(cotizacionParaPDF);
                     cargarCotizacionDesdeDatos(cotizacionData);
                     localStorage.removeItem('cotizacionParaPDF');
                     localStorage.removeItem('generarPDFAutomaticamente');
-                    
+
                     setTimeout(() => {
                         downloadPDFAlternative();
                     }, 1000);
@@ -551,13 +611,13 @@
                     console.error('Error cargando datos de cotización:', error);
                 }
             }
-            
+
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
             document.getElementById('fecha').value = `${year}-${month}-${day}`;
-            
+
             addItemRow();
             addEventListeners();
             setTimeout(updatePreview, 100);
@@ -572,16 +632,16 @@
             if (document.getElementById('cheque')) document.getElementById('cheque').value = cotizacionData.cheque || '';
             if (document.getElementById('nit')) document.getElementById('nit').value = cotizacionData.nit || '';
             if (document.getElementById('pago')) document.getElementById('pago').value = cotizacionData.pago || '';
-            if (document.getElementById('firmaEmpresa')) document.getElementById('firmaEmpresa').value = cotizacionData.firmaEmpresa || 'Licda. Carmen Concepcion Hernandez';
+            if (document.getElementById('firmaEmpresa')) document.getElementById('firmaEmpresa').value = cotizacionData.firmaEmpresa || 'Tec. Ing. Mario Roberto Gómez Martínez';
             if (document.getElementById('calcularIva')) document.getElementById('calcularIva').checked = cotizacionData.calcularIva !== undefined ? cotizacionData.calcularIva : true;
             if (document.getElementById('comentarios')) document.getElementById('comentarios').value = cotizacionData.comentarios || '';
             if (document.getElementById('folio')) document.getElementById('folio').value = cotizacionData.folio || '';
-            
+
             items = cotizacionData.items || [];
             if (items.length === 0) {
                 addItemRow();
             }
-            
+
             renderItemsTable();
             updatePreview();
             validateForm();
@@ -590,26 +650,26 @@
         function addEventListeners() {
             const inputs = document.querySelectorAll('input, textarea');
             inputs.forEach(input => {
-                input.addEventListener('input', function() {
+                input.addEventListener('input', function () {
                     updatePreview();
                     validateForm();
                 });
-                input.addEventListener('change', function() {
+                input.addEventListener('change', function () {
                     updatePreview();
                     validateForm();
                 });
-                input.addEventListener('keyup', function() {
+                input.addEventListener('keyup', function () {
                     updatePreview();
                     validateForm();
                 });
             });
 
-            document.getElementById('telefono').addEventListener('input', function(e) {
+            document.getElementById('telefono').addEventListener('input', function (e) {
                 formatPhoneNumber(e.target);
                 validateForm();
             });
 
-            document.getElementById('calcularIva').addEventListener('change', function() {
+            document.getElementById('calcularIva').addEventListener('change', function () {
                 updatePreview();
             });
         }
@@ -654,7 +714,7 @@
 
         function formatCurrency(value) {
             return "$" + Number(value).toLocaleString("en-US", {
-                minimumFractionDigits: 2, 
+                minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
         }
@@ -662,21 +722,21 @@
         function formatNumberInput(input) {
             let value = input.value.replace(/[^0-9.]/g, '');
             let parts = value.split('.');
-            
+
             if (parts[0]) {
                 parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             }
-            
+
             if (parts[1] && parts[1].length > 2) {
                 parts[1] = parts[1].substring(0, 2);
             }
-            
+
             input.value = parts.join('.');
         }
 
         function formatPhoneNumber(input) {
             let value = input.value.replace(/\D/g, '');
-            
+
             if (value.length === 8) {
                 input.value = `${value.substring(0, 4)}-${value.substring(4)}`;
             } else if (value.length === 11) {
@@ -713,7 +773,7 @@
         function renderItemsTable() {
             const tbody = document.getElementById('itemsBody');
             tbody.innerHTML = '';
-            
+
             items.forEach((item, index) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
@@ -726,7 +786,7 @@
                                oninput="updateItem(${index}, 'qty', this.value); renderItemsTable(); updatePreview(); validateForm();">
                     </td>
                     <td>
-                        <input type="text" min="0" step="0.01" placeholder="0.00" value="${item.unit > 0 ? item.unit.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2}) : ''}"
+                        <input type="text" min="0" step="0.01" placeholder="0.00" value="${item.unit > 0 ? item.unit.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : ''}"
                                oninput="formatNumberInput(this); updateItemFromFormattedInput(${index}, 'unit', this.value); updatePreview(); validateForm();">
                     </td>
                     <td class="total">${formatCurrency(item.total)}</td>
@@ -741,7 +801,7 @@
         function updateItem(index, field, value) {
             const item = items[index];
             item[field] = field === 'qty' || field === 'unit' ? Number(value) || 0 : value;
-            
+
             if (field === 'qty' || field === 'unit') {
                 item.total = item.qty * item.unit;
                 const rows = document.querySelectorAll('#itemsBody tr');
@@ -758,7 +818,7 @@
             const item = items[index];
             const numericValue = parseFloat(formattedValue.replace(/,/g, '')) || 0;
             item[field] = numericValue;
-            
+
             if (field === 'qty' || field === 'unit') {
                 item.total = item.qty * item.unit;
                 const rows = document.querySelectorAll('#itemsBody tr');
@@ -772,7 +832,7 @@
         }
 
         function getValidItems() {
-            return items.filter(item => 
+            return items.filter(item =>
                 item.desc.trim() !== "" && item.qty > 0 && item.unit >= 0
             );
         }
@@ -788,16 +848,16 @@
             document.getElementById('cheque').value = '';
             document.getElementById('nit').value = '';
             document.getElementById('pago').value = '';
-            document.getElementById('firmaEmpresa').value = 'Licda. Carmen Concepcion Hernandez';
+            document.getElementById('firmaEmpresa').value = 'Tec. Ing. Mario Roberto Gómez Martínez';
             document.getElementById('comentarios').value = '';
             document.getElementById('calcularIva').checked = true;
-            
+
             const today = new Date();
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
             document.getElementById('fecha').value = `${year}-${month}-${day}`;
-            
+
             items = [];
             addItemRow();
             updatePreview();
@@ -807,7 +867,7 @@
         function updatePreview() {
             const validItems = getValidItems();
             const itemsForTotals = getItemsForTotals();
-            
+
             const cliente = document.getElementById('cliente').value;
             const direccion = document.getElementById('direccion').value;
             const telefono = document.getElementById('telefono').value;
@@ -818,11 +878,11 @@
             const firmaEmpresa = document.getElementById('firmaEmpresa').value;
             const comentarios = document.getElementById('comentarios').value;
             const folio = document.getElementById('folio').value;
-            
-            const fechaFormateada = fecha ? 
+
+            const fechaFormateada = fecha ?
                 new Date(fecha + 'T00:00:00').toLocaleDateString("es-ES", {
                     day: "2-digit",
-                    month: "long", 
+                    month: "long",
                     year: "numeric"
                 }) : "";
 
@@ -919,7 +979,7 @@
                     </div>
                     <div class="signature-box">
                         <div class="signature-line"></div>
-                        <div class="signature-name">${firmaEmpresa || 'Mario Roberto Gomez Martinez'}</div>
+                        <div class="signature-name">${firmaEmpresa || 'Tec. Ing. Mario Roberto Gómez Martínez'}</div>
                         <div class="signature-title">Consultor de Desarrollo</div>
                     </div>
                 </div>
@@ -929,17 +989,17 @@
         function downloadPDFAlternative() {
             const preview = document.getElementById('cotizacion-preview');
             updatePreview();
-            
+
             window.scrollTo(0, 0);
 
             const originalMargin = preview.style.margin;
             preview.style.margin = '0';
 
-            const widthPx = preview.offsetWidth || 794; 
-            const heightPx = preview.offsetHeight; 
+            const widthPx = preview.offsetWidth || 794;
+            const heightPx = preview.offsetHeight;
 
             const widthPt = widthPx * 0.75;
-            const heightPt = (heightPx * 0.75) - 2; 
+            const heightPt = (heightPx * 0.75) - 2;
 
             let folioTexto = document.getElementById('folio').value || 'Generica';
             if (folioTexto.length > 15) folioTexto = folioTexto.substring(0, 8);
@@ -949,20 +1009,20 @@
                 filename: `Cotizacion_${folioTexto}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 pagebreak: { mode: 'avoid-all' },
-                html2canvas: { 
-                    scale: 2, 
-                    useCORS: true, 
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
                     logging: false,
                     scrollX: 0,
                     scrollY: 0
                 },
-                jsPDF: { 
-                    unit: 'pt', 
+                jsPDF: {
+                    unit: 'pt',
                     format: [widthPt, heightPt],
-                    orientation: 'portrait' 
+                    orientation: 'portrait'
                 }
             };
-            
+
             html2pdf().set(opt).from(preview).save().then(() => {
                 console.log('PDF generado exitosamente.');
                 preview.style.margin = originalMargin;
@@ -986,4 +1046,5 @@
         }
     </script>
 </body>
+
 </html>

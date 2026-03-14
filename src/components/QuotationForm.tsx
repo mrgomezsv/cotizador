@@ -25,7 +25,7 @@ export function QuotationForm({ onSuccess, onCancel, initialData }: QuotationFor
     direccion: initialData?.direccion || "",
     telefono: initialData?.telefono || "",
     fecha: initialData?.fecha || new Date().toISOString().split("T")[0],
-    firmaEmpresa: initialData?.firmaEmpresa || "Licda. Carmen Concepcion Hernandez",
+    firmaEmpresa: initialData?.firmaEmpresa || "Tec. Ing. Mario Roberto Gómez Martínez",
     cheque: initialData?.cheque || "",
     nit: initialData?.nit || "",
     pago: initialData?.pago || "",
@@ -101,7 +101,7 @@ export function QuotationForm({ onSuccess, onCancel, initialData }: QuotationFor
   const handleItemChange = (index: number, field: keyof Item, value: any) => {
     const newItems = [...formData.items];
     newItems[index] = { ...newItems[index], [field]: value };
-    
+
     if (field === "qty" || field === "unit") {
       newItems[index].total = newItems[index].qty * newItems[index].unit;
     }
@@ -187,7 +187,7 @@ export function QuotationForm({ onSuccess, onCancel, initialData }: QuotationFor
                 onChange={(e) => handleInputChange("cliente", e.target.value)}
                 onFocus={() => setShowClientSelector(true)}
               />
-              <button 
+              <button
                 type="button"
                 onClick={() => setShowClientSelector(!showClientSelector)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
