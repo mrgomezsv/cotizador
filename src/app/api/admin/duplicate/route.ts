@@ -19,11 +19,7 @@ export async function GET() {
     const formattedDate = today.toISOString().split('T')[0];
     const newFolio = crypto.randomBytes(20).toString('hex');
     
-    const copyData = original.toObject();
-    delete copyData._id;
-    delete copyData.createdAt;
-    delete copyData.updatedAt;
-    delete copyData.__v;
+    const { _id, createdAt, updatedAt, __v, ...copyData } = original.toObject();
     
     copyData.fecha = formattedDate;
     copyData.folio = newFolio;

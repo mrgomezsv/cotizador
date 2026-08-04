@@ -11,7 +11,8 @@ import {
   FileText,
   Trash2,
   MoreVertical,
-  Download
+  Download,
+  Copy
 } from "lucide-react";
 import { NotificationModal, NotificationType } from "./NotificationModal";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
   const [cotizaciones, setCotizaciones] = useState<ICotizacion[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
   const [selectedCotizacion, setSelectedCotizacion] = useState<ICotizacion | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [notification, setNotification] = useState<{
@@ -81,6 +83,66 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
   const handleEdit = (cotizacion: ICotizacion) => {
     setSelectedCotizacion(cotizacion);
     setIsEditModalOpen(true);
+  };
+
+  const handleDuplicate = async (cotizacion: ICotizacion) => {
+    try {
+      setDuplicatingId(cotizacion._id as unknown as string);
+      
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const fechaHoy = `${year}-${month}-${day}`;
+
+      const duplicatedData = {
+        cliente: cotizacion.cliente,
+        direccion: cotizacion.direccion || '',
+        telefono: cotizacion.telefono || '',
+        fecha: fechaHoy,
+        cheque: cotizacion.cheque || 'Mario Roberto Gomez Martinez',
+        nit: cotizacion.nit || 'N/A',
+        pago: cotizacion.pago || 'Contado',
+        firmaEmpresa: cotizacion.firmaEmpresa || 'Tec. Ing. Mario Roberto Gómez Martínez',
+        comentarios: cotizacion.comentarios || '',
+        items: cotizacion.items,
+        subTotal: cotizacion.subTotal,
+        iva: cotizacion.iva,
+        total: cotizacion.total,
+        calcularIva: cotizacion.calcularIva !== undefined ? cotizacion.calcularIva : true,
+        status: 'draft'
+      };
+
+      const response = await fetch('/api/cotizaciones', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(duplicatedData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Error al duplicar la cotización');
+      }
+
+      await fetchData();
+
+      setNotification({
+        isOpen: true,
+        type: "success",
+        title: "Cotización duplicada",
+        message: "Se ha generado una copia idéntica con la fecha de hoy y un nuevo folio.",
+      });
+
+    } catch (error) {
+      console.error('Error al duplicar la cotización:', error);
+      setNotification({
+        isOpen: true,
+        type: "error",
+        title: "Error al copiar",
+        message: "No se pudo duplicar la cotización. Inténtalo de nuevo.",
+      });
+    } finally {
+      setDuplicatingId(null);
+    }
   };
 
   const handleDownloadPDF = (cotizacion: ICotizacion) => {
@@ -149,24 +211,25 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    setNotification({
-      isOpen: true,
-      type: "confirm",
-      title: "Eliminar cotización",
-      message: "¿Estás seguro de que deseas eliminar esta cotización? Esta acción no se puede deshacer.",
-      confirmAction: () => confirmDelete(id),
-    });
-  };
-
   const confirmDelete = async (id: string) => {
     try {
-      const response = await fetch(`/api/cotizaciones/${id}`, { method: "DELETE" });
-      if (response.ok) {
-        fetchData();
+      const response = await fetch(`/api/cotizaciones/${id}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to delete");
       }
+
+      setCotizaciones((prev) => prev.filter((c) => (c._id as unknown as string) !== id));
+      setNotification({
+        isOpen: true,
+        type: "success",
+        title: "Eliminado con éxito",
+        message: "La cotización ha sido eliminada.",
+      });
     } catch (error) {
-      console.error("Error deleting:", error);
+      console.error("Error deleting cotizacion:", error);
       setNotification({
         isOpen: true,
         type: "error",
@@ -176,6 +239,16 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
     } finally {
       setNotification({ ...notification, isOpen: false });
     }
+  };
+
+  const handleDelete = async (id: string) => {
+    setNotification({
+      isOpen: true,
+      type: "confirm",
+      title: "Eliminar cotización",
+      message: "¿Estás seguro de que deseas eliminar esta cotización? Esta acción no se puede deshacer.",
+      confirmAction: () => confirmDelete(id),
+    });
   };
 
   return (
@@ -267,6 +340,23 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                             <div className="h-4 w-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
                           ) : (
                             <Download className="h-4 w-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => handleDuplicate(cotizacion)}
+                          disabled={duplicatingId === (cotizacion._id as unknown as string)}
+                          className={cn(
+                            "p-2 rounded-lg transition-all",
+                            duplicatingId === (cotizacion._id as unknown as string)
+                              ? "text-blue-600 bg-blue-50"
+                              : "text-slate-400 hover:text-blue-600 hover:bg-blue-50"
+                          )}
+                          title="Copiar cotización"
+                        >
+                          {duplicatingId === (cotizacion._id as unknown as string) ? (
+                            <div className="h-4 w-4 border-2 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                          ) : (
+                            <Copy className="h-4 w-4" />
                           )}
                         </button>
                         <button
