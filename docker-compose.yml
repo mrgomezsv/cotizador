@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    container_name: cotizador-app
+    ports:
+      - "3000:3000"
+    environment:
+      - MONGODB_URI=mongodb://db:27017/cotizador
+      - NODE_ENV=production
+    depends_on:
+      - db
+    restart: always
+
+  db:
+    image: mongo:latest
+    container_name: cotizador-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    restart: always
+
+volumes:
+  mongodb_data:

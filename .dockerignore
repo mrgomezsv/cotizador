@@ -1,0 +1,11 @@
+node_modules
+.next
+.git
+.DS_Store
+.env.local
+.vscode
+npm-debug.log
+README.md
+INSTRUCCIONES.md
+scripts
+legacy-angular

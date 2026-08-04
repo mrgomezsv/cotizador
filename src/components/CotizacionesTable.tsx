@@ -116,32 +116,26 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
         folio: cotizacion.folio || ''
       };
 
-      // Pass data via URL hash to avoid iframe storage restrictions
       const encodedData = encodeURIComponent(JSON.stringify(cotizacionData));
 
-      // Create hidden iframe
-      const iframeId = 'pdf-gen-iframe';
+      const iframeId = 'pdf-download-iframe';
       let iframe = document.getElementById(iframeId) as HTMLIFrameElement;
-
       if (!iframe) {
         iframe = document.createElement('iframe');
         iframe.id = iframeId;
         iframe.style.position = 'absolute';
-        iframe.style.width = '1200px'; // Give it some size
-        iframe.style.height = '1600px';
-        iframe.style.left = '-10000px';
-        iframe.style.top = '-10000px';
+        iframe.style.width = '0px';
+        iframe.style.height = '0px';
+        iframe.style.border = 'none';
         iframe.style.visibility = 'hidden';
         document.body.appendChild(iframe);
       }
 
-      // Load iframe with data in hash
       iframe.src = `/assets/cotizaciones-standalone.html#data=${encodedData}`;
 
-      // Reset state after more safe time
       setTimeout(() => {
         setDownloadingId(null);
-      }, 5000);
+      }, 3000);
 
     } catch (error) {
       console.error('Error al preparar la descarga del PDF:', error);
@@ -257,7 +251,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                       </span>
                     </td>
                     <td className="px-6 py-5 text-right">
-                      <div className="flex items-center justify-end gap-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="flex items-center justify-end gap-x-2">
                         <button
                           onClick={() => handleDownloadPDF(cotizacion)}
                           disabled={downloadingId === (cotizacion._id as unknown as string)}

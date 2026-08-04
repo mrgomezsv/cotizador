@@ -22,6 +22,7 @@ const cotizacionSchema = new mongoose.Schema({
   iva: { type: Number, required: true, default: 0 },
   total: { type: Number, required: true },
   calcularIva: { type: Boolean, default: false },
+  folio: { type: String, required: true, unique: true },
   status: { 
     type: String, 
     enum: ['draft', 'sent', 'approved', 'rejected'],

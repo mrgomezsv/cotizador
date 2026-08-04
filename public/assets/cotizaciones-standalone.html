@@ -439,32 +439,53 @@
             left: 50%;
             transform: translate(-50%, -50%) rotate(-15deg);
             width: 500px;
+            height: 500px;
             opacity: 0.03;
             z-index: 0;
             pointer-events: none;
         }
 
         @media print {
-            body {
-                background: white;
-                padding: 0;
+            @page {
+                size: portrait;
+                margin: 5mm 8mm;
             }
 
-            .cotizaciones-container,
+            body {
+                background: white;
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
             .actions,
             h1,
             h2,
-            .cotizacion-form {
-                display: none;
+            .cotizacion-form,
+            #validationMessage {
+                display: none !important;
+            }
+
+            .cotizaciones-container {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+                border: none;
+                box-shadow: none;
+                background: transparent;
             }
 
             .preview-container {
                 padding: 0;
                 background: none;
                 border: none;
+                margin: 0;
             }
 
             .pdf-container {
+                width: 100%;
+                min-height: auto;
+                padding: 10px 15px !important;
+                margin: 0 !important;
                 box-shadow: none;
                 border: none;
             }
@@ -566,7 +587,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="/assets/html2pdf.bundle.min.js"></script>
     <script>
         let items = [];
 
@@ -580,13 +601,17 @@
 
                     setTimeout(() => {
                         window.scrollTo(0, 0);
-                        const watermarkImg = document.querySelector('.watermark img');
-                        if (watermarkImg && !watermarkImg.complete) {
-                            watermarkImg.onload = () => downloadPDFAlternative();
-                        } else {
-                            downloadPDFAlternative();
+                        try {
+                            if (typeof html2pdf !== 'undefined') {
+                                downloadPDFAlternative();
+                            } else {
+                                window.print();
+                            }
+                        } catch(err) {
+                            console.error("Fallo al descargar PDF automático:", err);
+                            window.print();
                         }
-                    }, 1500);
+                    }, 800);
                     return;
                 } catch (e) {
                     console.error('Error parseando datos del hash:', e);
@@ -625,19 +650,25 @@
         });
 
         function cargarCotizacionDesdeDatos(cotizacionData) {
-            if (document.getElementById('cliente')) document.getElementById('cliente').value = cotizacionData.cliente || '';
-            if (document.getElementById('direccion')) document.getElementById('direccion').value = cotizacionData.direccion || '';
-            if (document.getElementById('telefono')) document.getElementById('telefono').value = cotizacionData.telefono || '';
+            if (document.getElementById('cliente')) document.getElementById('cliente').value = cotizacionData.cliente || 'Cliente';
+            if (document.getElementById('direccion')) document.getElementById('direccion').value = cotizacionData.direccion || 'N/A';
+            if (document.getElementById('telefono')) document.getElementById('telefono').value = cotizacionData.telefono || 'N/A';
             if (document.getElementById('fecha')) document.getElementById('fecha').value = cotizacionData.fecha || '';
-            if (document.getElementById('cheque')) document.getElementById('cheque').value = cotizacionData.cheque || '';
-            if (document.getElementById('nit')) document.getElementById('nit').value = cotizacionData.nit || '';
-            if (document.getElementById('pago')) document.getElementById('pago').value = cotizacionData.pago || '';
+            if (document.getElementById('cheque')) document.getElementById('cheque').value = cotizacionData.cheque || 'Mario Roberto Gomez Martinez';
+            if (document.getElementById('nit')) document.getElementById('nit').value = cotizacionData.nit || 'N/A';
+            if (document.getElementById('pago')) document.getElementById('pago').value = cotizacionData.pago || 'Contado';
             if (document.getElementById('firmaEmpresa')) document.getElementById('firmaEmpresa').value = cotizacionData.firmaEmpresa || 'Tec. Ing. Mario Roberto Gómez Martínez';
             if (document.getElementById('calcularIva')) document.getElementById('calcularIva').checked = cotizacionData.calcularIva !== undefined ? cotizacionData.calcularIva : true;
             if (document.getElementById('comentarios')) document.getElementById('comentarios').value = cotizacionData.comentarios || '';
             if (document.getElementById('folio')) document.getElementById('folio').value = cotizacionData.folio || '';
 
-            items = cotizacionData.items || [];
+            items = (cotizacionData.items || []).map(item => ({
+                desc: item.desc || item.descripcion || 'Item',
+                qty: Number(item.qty || item.cantidad || 1),
+                unit: Number(item.unit || item.precioUnitario || 0),
+                total: Number(item.total || 0)
+            }));
+
             if (items.length === 0) {
                 addItemRow();
             }
@@ -1005,20 +1036,21 @@
             if (folioTexto.length > 15) folioTexto = folioTexto.substring(0, 8);
 
             const opt = {
-                margin: 0,
+                margin: 10,
                 filename: `Cotizacion_${folioTexto}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 pagebreak: { mode: 'avoid-all' },
                 html2canvas: {
                     scale: 2,
                     useCORS: true,
+                    allowTaint: true,
                     logging: false,
                     scrollX: 0,
                     scrollY: 0
                 },
                 jsPDF: {
-                    unit: 'pt',
-                    format: [widthPt, heightPt],
+                    unit: 'mm',
+                    format: 'letter',
                     orientation: 'portrait'
                 }
             };
@@ -1027,9 +1059,9 @@
                 console.log('PDF generado exitosamente.');
                 preview.style.margin = originalMargin;
             }).catch(err => {
-                console.error('Error al generar PDF:', err);
+                console.error('Error al generar PDF con html2pdf, lanzando diálogo de impresión:', err);
                 preview.style.margin = originalMargin;
-                alert('Hubo un error al generar el PDF. Por favor intente de nuevo.');
+                window.print();
             });
         }
 
