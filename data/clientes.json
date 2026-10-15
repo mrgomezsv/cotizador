@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "69b4f7b4fbc3da99f7a676fd",
+    "name": "Joaquin Vides",
+    "__v": 0,
+    "address": "8 Calle Oriente, San Miguel",
+    "createdAt": "2026-03-14T05:52:52.009Z",
+    "is_active": true,
+    "nit": "1205",
+    "phone": "",
+    "status": "active",
+    "updatedAt": "2026-03-14T05:52:52.009Z"
+  }
+]

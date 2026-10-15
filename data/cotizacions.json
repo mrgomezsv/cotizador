@@ -1,0 +1,455 @@
+[
+  {
+    "_id": "6924ac19d09466c11c5490ec",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2025-11-11",
+    "cheque": "",
+    "nit": "",
+    "pago": "",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "items": [
+      {
+        "desc": "MANTENIMIENTO DE GABINETE PRINCIPAL (OFICINA ADMINISTRATIVA)",
+        "qty": 1,
+        "unit": 210,
+        "total": 210
+      },
+      {
+        "desc": "MANTENIMIENTO DE GABINETE SECUNDARIO (ADUANA)",
+        "qty": 1,
+        "unit": 200,
+        "total": 200
+      }
+    ],
+    "subTotal": 410,
+    "iva": 0,
+    "total": 410,
+    "calcularIva": false,
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2025-11-11T00:00:00.000Z",
+    "updatedAt": "2026-03-13T02:14:38.667Z",
+    "__v": 0,
+    "comentarios": "LIMPIEZA DE GABINETE PRINCIPAL INCLUYE MANTENIMIENTO DE PLANTA TELEFONICA\nMANTENIMIENTO DE FIREWALL\nMANTENIMIENTO DE SWITCH MIKROTIK\nSOPLETEADO Y LIMPIEZA INTERNA DE TODO EL GABINETE VERIFICACION DE ESTADOS DE INYECTORES POE Y ESTADO DE ANTENAS OPTIMIZACION Y VERIFICACION DE ESTADOS DE SERVIDOR\nLIMPIEZA DE GABINETE SECUNDARIO\nMANTENIMIENTO DE SWITCH\nMANTENIMIENTO DE UPS CENTRALIZADO\nMANTENIMIENTO DE ROUTERS\nLIMPIEZA INTERNA DE TODO EL GABINETE (SE DEMONTARAN EQUIPOS PARA LOGRAR UNA BUENA LIMPIEZA)\n\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO DE LUNES A DOMINGO",
+    "folio": "1cc14840223a2eff686689220a17d29ef2841cc2"
+  },
+  {
+    "_id": "6924ac19d09466c11c5490ee",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2025-11-11",
+    "cheque": "",
+    "nit": "",
+    "pago": "",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "items": [
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (OFICINA)",
+        "qty": 3,
+        "unit": 18,
+        "total": 54
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (OFICINA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO IMPRESORES (OFICINA ADMINISTRATIVA)",
+        "qty": 1,
+        "unit": 23,
+        "total": 23
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (ADUANA)",
+        "qty": 6,
+        "unit": 18,
+        "total": 108
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (CLINICA)",
+        "qty": 1,
+        "unit": 18,
+        "total": 18
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO SERVIDOR DELL T40",
+        "qty": 1,
+        "unit": 65,
+        "total": 65
+      }
+    ],
+    "subTotal": 304,
+    "iva": 0,
+    "total": 304,
+    "calcularIva": false,
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2025-11-11T00:00:00.000Z",
+    "updatedAt": "2026-03-13T02:14:38.725Z",
+    "__v": 0,
+    "comentarios": "EL MANTENIMIENTO PREVENTIVO A COMPUTADORAS INCLUYE:\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LLIMPIEZA DE PLACA MADRE Y COMPONENTES LUBRICACION DE VENTILADORES\nCAMBIO DE PASTA TERMICA A PROCESADORES\nLIMPIEZA DE TECLADO CON ESPUMA LIMPIADORA\nLIMPIEZA DE PANTALLA CON LIQUIDO LIMPIAPANTALLAS OPTIMIZACION DE SISTEMA OPERATIVO\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO\nRESUMEN DE ESTADO DE CADA COMPUTADORA Y RECOMENDACIONES\nMANTENIMIENTO DE IMPRESORES\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LUBRICANCION DE SISTEMA DE ENGRANAJES\nVERIFICACION DE ESTADO DE PIESAS\nLIMPIEZA DE INYECTORES Y ALINEADO DE CABEZALES\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO DE LUNES A DOMINGO",
+    "folio": "fcb797a132d21e854ee83fa1d01b7708f9bed64f"
+  },
+  {
+    "_id": "69b3742026fcfe158bcdeb34",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2026-03-13",
+    "cheque": "",
+    "nit": "",
+    "pago": "",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "comentarios": "EL MANTENIMIENTO PREVENTIVO A COMPUTADORAS INCLUYE:\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LLIMPIEZA DE PLACA MADRE Y COMPONENTES LUBRICACION DE VENTILADORES\nCAMBIO DE PASTA TERMICA A PROCESADORES\nLIMPIEZA DE TECLADO CON ESPUMA LIMPIADORA\nLIMPIEZA DE PANTALLA CON LIQUIDO LIMPIAPANTALLAS OPTIMIZACION DE SISTEMA OPERATIVO\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO\nRESUMEN DE ESTADO DE CADA COMPUTADORA Y RECOMENDACIONES\nMANTENIMIENTO DE IMPRESORES\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LUBRICANCION DE SISTEMA DE ENGRANAJES\nVERIFICACION DE ESTADO DE PIESAS\nLIMPIEZA DE INYECTORES Y ALINEADO DE CABEZALES\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO DE LUNES A DOMINGO",
+    "items": [
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (OFICINA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (OFICINA)",
+        "qty": 3,
+        "unit": 18,
+        "total": 54
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO IMPRESORES (OFICINA ADMINISTRATIVA)",
+        "qty": 1,
+        "unit": 23,
+        "total": 23
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (ADUANA)",
+        "qty": 5,
+        "unit": 18,
+        "total": 90
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (CLINICA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO SERVIDOR DELL T40",
+        "qty": 1,
+        "unit": 65,
+        "total": 65
+      }
+    ],
+    "subTotal": 304,
+    "iva": 0,
+    "total": 304,
+    "calcularIva": false,
+    "folio": "99f95881f781f6a41f4781fab564b1875d574c61",
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2026-03-13T02:19:12.694Z",
+    "updatedAt": "2026-03-13T22:00:54.069Z",
+    "__v": 0
+  },
+  {
+    "_id": "69b4f7b3a2d28b3b28faf381",
+    "cliente": "Joaquin Vides",
+    "direccion": "8 Calle Oriente, San Miguel",
+    "telefono": "",
+    "fecha": "2026-03-14",
+    "cheque": "",
+    "nit": "1205",
+    "pago": "",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gómez Martínez",
+    "comentarios": "",
+    "items": [
+      {
+        "desc": "Producto 1",
+        "qty": 1,
+        "unit": 99,
+        "total": 99
+      },
+      {
+        "desc": "Producto 2",
+        "qty": 1,
+        "unit": 23,
+        "total": 23
+      }
+    ],
+    "subTotal": 122,
+    "iva": 15.860000000000001,
+    "total": 137.86,
+    "calcularIva": true,
+    "folio": "ed83fcb2f9c6637abf3ea688b2d258b7fef45cc0",
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2026-03-14T05:52:51.998Z",
+    "updatedAt": "2026-03-14T05:52:51.998Z",
+    "__v": 0
+  },
+  {
+    "_id": "69fcae682387466cb07db347",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2026-05-02T12:00:00",
+    "cheque": "",
+    "nit": "",
+    "pago": "",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "comentarios": "EL MANTENIMIENTO PREVENTIVO A COMPUTADORAS INCLUYE:\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LLIMPIEZA DE PLACA MADRE Y COMPONENTES LUBRICACION DE VENTILADORES\nCAMBIO DE PASTA TERMICA A PROCESADORES\nLIMPIEZA DE TECLADO CON ESPUMA LIMPIADORA\nLIMPIEZA DE PANTALLA CON LIQUIDO LIMPIAPANTALLAS OPTIMIZACION DE SISTEMA OPERATIVO\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO\nRESUMEN DE ESTADO DE CADA COMPUTADORA Y RECOMENDACIONES\nMANTENIMIENTO DE IMPRESORES\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LUBRICANCION DE SISTEMA DE ENGRANAJES\nVERIFICACION DE ESTADO DE PIESAS\nLIMPIEZA DE INYECTORES Y ALINEADO DE CABEZALES\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO DE LUNES A DOMINGO",
+    "items": [
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (OFICINA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (OFICINA)",
+        "qty": 3,
+        "unit": 18,
+        "total": 54
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO IMPRESORES (OFICINA ADMINISTRATIVA)",
+        "qty": 1,
+        "unit": 23,
+        "total": 23
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (ADUANA)",
+        "qty": 5,
+        "unit": 18,
+        "total": 90
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (CLINICA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO SERVIDOR DELL T40",
+        "qty": 1,
+        "unit": 65,
+        "total": 65
+      }
+    ],
+    "subTotal": 304,
+    "iva": 0,
+    "total": 304,
+    "calcularIva": false,
+    "folio": "adab141397db2d3ab8faa8858132e809500369a9",
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2026-05-07T15:23:20.040Z",
+    "updatedAt": "2026-05-07T15:23:20.042Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a722fbb2be039a709a91982",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2026-08-04",
+    "cheque": "Mario Roberto Gomez Martinez",
+    "nit": "N/A",
+    "pago": "Contado",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "comentarios": "EL MANTENIMIENTO PREVENTIVO A COMPUTADORAS INCLUYE:\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LLIMPIEZA DE PLACA MADRE Y COMPONENTES LUBRICACION DE VENTILADORES\nCAMBIO DE PASTA TERMICA A PROCESADORES\nLIMPIEZA DE TECLADO CON ESPUMA LIMPIADORA\nLIMPIEZA DE PANTALLA CON LIQUIDO LIMPIAPANTALLAS OPTIMIZACION DE SISTEMA OPERATIVO\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO\nRESUMEN DE ESTADO DE CADA COMPUTADORA Y RECOMENDACIONES\nMANTENIMIENTO DE IMPRESORES\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LUBRICANCION DE SISTEMA DE ENGRANAJES\nVERIFICACION DE ESTADO DE PIESAS\nLIMPIEZA DE INYECTORES Y ALINEADO DE CABEZALES\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO DE LUNES A DOMINGO",
+    "items": [
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (OFICINA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (OFICINA)",
+        "qty": 3,
+        "unit": 18,
+        "total": 54
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO IMPRESORES (OFICINA ADMINISTRATIVA)",
+        "qty": 1,
+        "unit": 23,
+        "total": 23
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (ADUANA)",
+        "qty": 5,
+        "unit": 18,
+        "total": 90
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (CLINICA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO SERVIDOR DELL T40",
+        "qty": 1,
+        "unit": 65,
+        "total": 65
+      }
+    ],
+    "subTotal": 304,
+    "iva": 0,
+    "total": 304,
+    "calcularIva": false,
+    "folio": "7a0d4e9092d35031a1fc5291bac670b86c28d1a2",
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2026-08-04T18:30:19.680Z",
+    "updatedAt": "2026-08-04T18:30:19.680Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7234be2be039a709a9199c",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2026-08-04",
+    "cheque": "Mario Roberto Gomez Martinez",
+    "nit": "N/A",
+    "pago": "Contado",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "comentarios": "Procedimiento de cambios intercambio de Mouse Pad entre Laptop Lenovo de la Licda y Laptop Lenovo del Ing Mejia",
+    "items": [
+      {
+        "desc": "Procedimiento de Intercambio de MousePAD entre Laptops Lenovo",
+        "qty": 1,
+        "unit": 25,
+        "total": 25
+      }
+    ],
+    "subTotal": 25,
+    "iva": 0,
+    "total": 25,
+    "calcularIva": false,
+    "folio": "3e55eb7c4fc3e97efee61606edc7f45614999787",
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2026-08-04T18:51:42.740Z",
+    "updatedAt": "2026-08-04T18:56:28.694Z",
+    "__v": 0
+  },
+  {
+    "_id": "6ad024f4561d06900b81b1d3",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2026-10-10",
+    "cheque": "",
+    "nit": "",
+    "pago": "",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "comentarios": "LIMPIEZA DE GABINETE PRINCIPAL INCLUYE MANTENIMIENTO DE PLANTA TELEFONICA\nMANTENIMIENTO DE FIREWALL\nMANTENIMIENTO DE SWITCH MIKROTIK\nSOPLETEADO Y LIMPIEZA INTERNA DE TODO EL GABINETE VERIFICACION DE ESTADOS DE INYECTORES POE Y ESTADO DE ANTENAS OPTIMIZACION Y VERIFICACION DE ESTADOS DE SERVIDOR\nLIMPIEZA DE GABINETE SECUNDARIO\nMANTENIMIENTO DE SWITCH\nMANTENIMIENTO DE UPS CENTRALIZADO\nMANTENIMIENTO DE ROUTERS\nLIMPIEZA INTERNA DE TODO EL GABINETE (SE DEMONTARAN EQUIPOS PARA LOGRAR UNA BUENA LIMPIEZA)\n\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO DE LUNES A DOMINGO",
+    "items": [
+      {
+        "desc": "MANTENIMIENTO DE GABINETE PRINCIPAL (OFICINA ADMINISTRATIVA)",
+        "qty": 1,
+        "unit": 210,
+        "total": 210
+      },
+      {
+        "desc": "MANTENIMIENTO DE GABINETE SECUNDARIO (ADUANA)",
+        "qty": 1,
+        "unit": 200,
+        "total": 200
+      }
+    ],
+    "subTotal": 410,
+    "iva": 0,
+    "total": 410,
+    "calcularIva": false,
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2026-10-15T00:57:24.742Z",
+    "updatedAt": "2026-10-15T00:57:24.747Z",
+    "__v": 0,
+    "folio": "4792318dae746d8b97557fb88fab0c113e8ba25a"
+  },
+  {
+    "_id": "6ad02e386b4907920d3bd11a",
+    "cliente": "ZONA FRANCA MIRAMAR",
+    "direccion": "ZONA FRANCA MIRAMAR",
+    "telefono": "7844-2446",
+    "fecha": "2026-10-10",
+    "cheque": "",
+    "nit": "",
+    "pago": "",
+    "firmaEmpresa": "Tec. Ing. Mario Roberto Gomez Martinez",
+    "comentarios": "EL MANTENIMIENTO PREVENTIVO A COMPUTADORAS INCLUYE:\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LLIMPIEZA DE PLACA MADRE Y COMPONENTES LUBRICACION DE VENTILADORES\nCAMBIO DE PASTA TERMICA A PROCESADORES\nLIMPIEZA DE TECLADO CON ESPUMA LIMPIADORA\nLIMPIEZA DE PANTALLA CON LIQUIDO LIMPIAPANTALLAS OPTIMIZACION DE SISTEMA OPERATIVO\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO\nRESUMEN DE ESTADO DE CADA COMPUTADORA Y RECOMENDACIONES\nMANTENIMIENTO DE IMPRESORES\nSOPLETEADO INTERNO PARA REMOCION DE POLVO LUBRICANCION DE SISTEMA DE ENGRANAJES\nVERIFICACION DE ESTADO DE PIESAS\nLIMPIEZA DE INYECTORES Y ALINEADO DE CABEZALES\nSOPORTE REMOTO O PRESENCIAL EN CASO DE SER REQUERIDO DE LUNES A DOMINGO",
+    "items": [
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (OFICINA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (OFICINA)",
+        "qty": 2,
+        "unit": 18,
+        "total": 36
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO IMPRESORES (OFICINA ADMINISTRATIVA)",
+        "qty": 1,
+        "unit": 23,
+        "total": 23
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (ADUANA)",
+        "qty": 5,
+        "unit": 18,
+        "total": 90
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS LAPTOPS (CLINICA)",
+        "qty": 1,
+        "unit": 18,
+        "total": 18
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO EQUIPOS DESKTOP (CLINICA)",
+        "qty": 1,
+        "unit": 18,
+        "total": 18
+      },
+      {
+        "desc": "MANTENIMIENTO PREVENTIVO SERVIDOR DELL T40",
+        "qty": 1,
+        "unit": 65,
+        "total": 65
+      }
+    ],
+    "subTotal": 286,
+    "iva": 0,
+    "total": 286,
+    "calcularIva": false,
+    "folio": "ea3f366ca121409356d59c9fdff1e7d43ff445b0",
+    "status": "draft",
+    "userId": null,
+    "companyId": null,
+    "createdAt": "2026-10-15T01:36:56.335Z",
+    "updatedAt": "2026-10-15T01:36:56.335Z",
+    "__v": 0
+  }
+]

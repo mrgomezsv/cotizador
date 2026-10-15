@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:export": "node scripts/export-db.js",
+    "db:import": "node scripts/import-db.js"
   },
   "dependencies": {
     "clsx": "^2.1.1",
