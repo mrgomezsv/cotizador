@@ -12,7 +12,8 @@ import {
   Trash2,
   MoreVertical,
   Download,
-  Copy
+  Copy,
+  CheckCircle2
 } from "lucide-react";
 import { NotificationModal, NotificationType } from "./NotificationModal";
 import { cn } from "@/lib/utils";
@@ -30,7 +31,7 @@ const statusStyles = {
 const statusLabels = {
   draft: "Generada",
   sent: "En Revisión",
-  approved: "Aceptada",
+  approved: "Aprobada",
   rejected: "Rechazada",
 };
 
@@ -43,6 +44,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [duplicatingId, setDuplicatingId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
   const [selectedCotizacion, setSelectedCotizacion] = useState<ICotizacion | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [notification, setNotification] = useState<{
@@ -228,6 +230,48 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
     }
   };
 
+  const handleToggleApprove = async (cotizacion: ICotizacion) => {
+    const id = cotizacion._id as unknown as string;
+    const nextStatus = cotizacion.status === "approved" ? "draft" : "approved";
+    const nextLabel = nextStatus === "approved" ? "Aprobada" : "Generada";
+
+    try {
+      setUpdatingStatusId(id);
+      const response = await fetch(`/api/cotizaciones/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error("No se pudo actualizar el estado de la cotización");
+      }
+
+      setCotizaciones((prev) =>
+        prev.map((c) =>
+          (c._id as unknown as string) === id ? ({ ...c, status: nextStatus } as ICotizacion) : c
+        )
+      );
+
+      setNotification({
+        isOpen: true,
+        type: "success",
+        title: nextStatus === "approved" ? "¡Cotización Aprobada!" : "Estado Actualizado",
+        message: `La cotización para ${cotizacion.cliente} ahora está en estado "${nextLabel}".`,
+      });
+    } catch (error) {
+      console.error("Error updating status:", error);
+      setNotification({
+        isOpen: true,
+        type: "error",
+        title: "Error al cambiar estado",
+        message: "No se pudo actualizar el estado de la cotización en la base de datos.",
+      });
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
+
   const confirmDelete = async (id: string) => {
     try {
       const response = await fetch(`/api/cotizaciones/${id}`, {
@@ -327,12 +371,18 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                       </div>
                     </td>
                     <td className="px-6 py-5">
-                      <span className={cn(
-                        "px-3 py-1 rounded-full text-[11px] font-bold border",
-                        statusStyles[cotizacion.status as keyof typeof statusStyles]
-                      )}>
+                      <button
+                        onClick={() => handleToggleApprove(cotizacion)}
+                        disabled={updatingStatusId === (cotizacion._id as unknown as string)}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-[11px] font-bold border transition-all hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-1.5",
+                          statusStyles[cotizacion.status as keyof typeof statusStyles]
+                        )}
+                        title={cotizacion.status === "approved" ? "Clic para cambiar a Generada" : "Clic para marcar como Aprobada"}
+                      >
+                        {cotizacion.status === "approved" && <CheckCircle2 className="h-3 w-3 text-emerald-600" />}
                         {statusLabels[cotizacion.status as keyof typeof statusLabels]}
-                      </span>
+                      </button>
                     </td>
                     <td className="px-6 py-5">
                       <span className="flex items-center gap-x-1 text-xs font-medium text-slate-500">
@@ -342,6 +392,23 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                     </td>
                     <td className="px-6 py-5 text-right">
                       <div className="flex items-center justify-end gap-x-2">
+                        <button
+                          onClick={() => handleToggleApprove(cotizacion)}
+                          disabled={updatingStatusId === (cotizacion._id as unknown as string)}
+                          className={cn(
+                            "p-2 rounded-lg transition-all",
+                            cotizacion.status === "approved"
+                              ? "text-emerald-600 bg-emerald-50 hover:bg-emerald-100"
+                              : "text-slate-400 hover:text-emerald-600 hover:bg-emerald-50"
+                          )}
+                          title={cotizacion.status === "approved" ? "Aprobada (clic para volver a Generada)" : "Aprobar cotización"}
+                        >
+                          {updatingStatusId === (cotizacion._id as unknown as string) ? (
+                            <div className="h-4 w-4 border-2 border-emerald-600/30 border-t-emerald-600 rounded-full animate-spin"></div>
+                          ) : (
+                            <CheckCircle2 className={cn("h-4 w-4", cotizacion.status === "approved" ? "text-emerald-600" : "")} />
+                          )}
+                        </button>
                         <button
                           onClick={() => handleDownloadPDF(cotizacion)}
                           disabled={downloadingId === (cotizacion._id as unknown as string)}

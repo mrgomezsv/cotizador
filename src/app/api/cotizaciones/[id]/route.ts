@@ -30,3 +30,19 @@ export async function PUT(
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+    const { id } = await params;
+    const data = await request.json();
+    const updatedCotizacion = await Cotizacion.findByIdAndUpdate(id, data, { new: true });
+    return NextResponse.json(updatedCotizacion);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
