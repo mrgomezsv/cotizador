@@ -58,6 +58,19 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
     message: "",
   });
 
+  const formatDateDisplay = (dateString: string) => {
+    if (!dateString) return "";
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const [year, month, day] = dateString.split('-').map(Number);
+      const date = new Date(year, month - 1, day, 12, 0, 0);
+      return date.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
+    }
+    const date = new Date(dateString);
+    return isNaN(date.getTime())
+      ? dateString
+      : date.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
+  };
+
   async function fetchData() {
     setLoading(true);
     try {
@@ -151,12 +164,16 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
 
       let fechaFormateada = "";
       if (cotizacion.fecha) {
-        const fecha = new Date(cotizacion.fecha);
-        if (!isNaN(fecha.getTime())) {
-          const year = fecha.getFullYear();
-          const month = String(fecha.getMonth() + 1).padStart(2, '0');
-          const day = String(fecha.getDate()).padStart(2, '0');
-          fechaFormateada = `${year}-${month}-${day}`;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(cotizacion.fecha)) {
+          fechaFormateada = cotizacion.fecha;
+        } else {
+          const fecha = new Date(cotizacion.fecha);
+          if (!isNaN(fecha.getTime())) {
+            const year = fecha.getFullYear();
+            const month = String(fecha.getMonth() + 1).padStart(2, '0');
+            const day = String(fecha.getDate()).padStart(2, '0');
+            fechaFormateada = `${year}-${month}-${day}`;
+          }
         }
       }
 
@@ -285,8 +302,8 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                 filteredData.map((cotizacion: ICotizacion) => (
                   <tr key={cotizacion._id as unknown as string} className="group hover:bg-slate-50/50 transition-colors">
                     <td className="px-6 py-5">
-                      <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded" title={cotizacion.folio}>
-                        {cotizacion.folio ? `${cotizacion.folio.substring(0, 8)}...` : "S/F"}
+                      <span className="text-[10px] font-mono font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded" title={cotizacion.folio || (cotizacion._id as unknown as string)}>
+                        {cotizacion.folio ? `${cotizacion.folio.substring(0, 8)}...` : (cotizacion._id ? `${(cotizacion._id as unknown as string).substring(0, 8)}...` : "S/F")}
                       </span>
                     </td>
                     <td className="px-6 py-5">
@@ -306,7 +323,7 @@ export function CotizacionesTable({ searchTerm = "" }: CotizacionesTableProps) {
                     <td className="px-6 py-5">
                       <div className="flex items-center gap-x-2 text-xs font-medium text-slate-500">
                         <Clock className="h-3.5 w-3.5" />
-                        {new Date(cotizacion.fecha).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
+                        {formatDateDisplay(cotizacion.fecha)}
                       </div>
                     </td>
                     <td className="px-6 py-5">
